@@ -191,7 +191,7 @@ button {
     background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik01MCAxNSBMNjYgMjYgTDYwIDQ1IEw0MCA0NSBMMzQgMjYgWiIgZmlsbD0iI0ZGNEQ2RCIvPjxwYXRoIGQ9Ik01MCA4NSBMNjYgNzQgTDYwIDU1IEw0MCA1NSBMMzQgNzQgWiIgZmlsbD0iI0Q0QUYzNyIvPjxwYXRoIGQ9Ik0xNSA1MCBMMjYgMzQgTDQ1IDQwIEw0NSA2MCBMMjYgNjYgWiIgZmlsbD0iIzRBOTBFMiIvPjxwYXRoIGQ9Ik04NSA1MCBMNzQgNjYgTDU1IDYwIEw1NSA0MCBMNzQgMzQgWiIgZmlsbD0iIzJFQ0M3MSIvPjxwYXRoIGQ9Ik01MCA0NSBMNjAgNTUgTDUwIDY1IEw0MCA1NSBaIiBmaWxsPSIjRkZCNkMxIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+') center center no-repeat;
     background-size: contain;
     color: transparent;
-    animation: spin-3d 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    animation: worldcup-roll 2s ease-in-out infinite;
     border-radius: 50%;
     box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
 }
@@ -226,18 +226,17 @@ button {
     color: white;
 }
 
-@keyframes spin-3d {
+@keyframes worldcup-roll {
     0% {
-        transform: rotate(0deg) scale(1);
+        transform: translateX(-120px) rotate(-200deg);
     }
 
     50% {
-        transform: rotate(180deg) scale(1.15);
-        box-shadow: 0 20px 40px rgba(212, 175, 55, 0.4);
+        transform: translateX(120px) rotate(200deg);
     }
 
     100% {
-        transform: rotate(360deg) scale(1);
+        transform: translateX(-120px) rotate(-200deg);
     }
 }
 
