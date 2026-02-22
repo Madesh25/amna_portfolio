@@ -24,7 +24,7 @@ function publicApp() {
                 if (window.github) {
                     this.api = window.github;
                     if (!this.api.owner || !this.api.repo) {
-                        this.api.setRepoInfo('YOUR_GITHUB_USERNAME', 'amna');
+                        this.api.setRepoInfo('Madesh25', 'amna_portfolio');
                     }
                     this.fetchAllContent();
                 } else {
