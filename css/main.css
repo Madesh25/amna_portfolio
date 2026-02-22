@@ -134,27 +134,22 @@ button {
 
 .bg-image {
     position: absolute;
-    width: 45vw;
+    width: 100vw;
     height: 100vh;
     top: 0;
     background-size: cover;
     background-position: center;
-    opacity: 0.7;
-    /* Much clearer and sharper */
+    opacity: 0.45;
+    /* Softened so text remains highly readable over the complex image */
 }
 
 .strawberry-bg {
     left: 0;
-    background-image: url('../img/strawberry_bg.png');
-    -webkit-mask-image: linear-gradient(to right, black 40%, transparent 100%);
-    mask-image: linear-gradient(to right, black 40%, transparent 100%);
+    background-image: url('../img/custom_hero_bg.png');
 }
 
 .rm-bg {
-    right: 0;
-    background-image: url('../img/rm_bg.png');
-    -webkit-mask-image: linear-gradient(to left, black 40%, transparent 100%);
-    mask-image: linear-gradient(to left, black 40%, transparent 100%);
+    display: none;
 }
 
 /* Real Madrid Watermark Crest */
