@@ -185,9 +185,10 @@ button {
 }
 
 .rolling-football {
+    display: inline-block !important;
     width: 65px;
     height: 65px;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23FFFFFF"/><path d="M50 15 L66 26 L60 45 L40 45 L34 26 Z" fill="%23FF4D6D"/><path d="M50 85 L66 74 L60 55 L40 55 L34 74 Z" fill="%23D4AF37"/><path d="M15 50 L26 34 L45 40 L45 60 L26 66 Z" fill="%234A90E2"/><path d="M85 50 L74 66 L55 60 L55 40 L74 34 Z" fill="%232ECC71"/><path d="M50 45 L60 55 L50 65 L40 55 Z" fill="%23FFB6C1"/><circle cx="50" cy="50" r="48" fill="none" stroke="%23333" stroke-width="4"/></svg>') center center no-repeat;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik01MCAxNSBMNjYgMjYgTDYwIDQ1IEw0MCA0NSBMMzQgMjYgWiIgZmlsbD0iI0ZGNEQ2RCIvPjxwYXRoIGQ9Ik01MCA4NSBMNjYgNzQgTDYwIDU1IEw0MCA1NSBMMzQgNzQgWiIgZmlsbD0iI0Q0QUYzNyIvPjxwYXRoIGQ9Ik0xNSA1MCBMMjYgMzQgTDQ1IDQwIEw0NSA2MCBMMjYgNjYgWiIgZmlsbD0iIzRBOTBFMiIvPjxwYXRoIGQ9Ik04NSA1MCBMNzQgNjYgTDU1IDYwIEw1NSA0MCBMNzQgMzQgWiIgZmlsbD0iIzJFQ0M3MSIvPjxwYXRoIGQ9Ik01MCA0NSBMNjAgNTUgTDUwIDY1IEw0MCA1NSBaIiBmaWxsPSIjRkZCNkMxIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+') center center no-repeat;
     background-size: contain;
     color: transparent;
     animation: spin-3d 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
