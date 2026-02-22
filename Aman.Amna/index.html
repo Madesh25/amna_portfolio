@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aman.Amna Admin Panel</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SimpleMDE for Markdown -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
+
+    <!-- CodeMirror Layout Fixes (Overriding Tailwind Procsss) -->
+    <style>
+        .CodeMirror {
+            text-align: left !important;
+            font-family: monospace !important;
+        }
+
+        .CodeMirror-lines {
+            padding: 10px 0 !important;
+        }
+
+        .CodeMirror pre.CodeMirror-line,
+        .CodeMirror pre.CodeMirror-line-like {
+            padding: 0 10px !important;
+            line-height: 1.5 !important;
+        }
+    </style>
+
+    <!-- LocalForage for High-Capacity Mock DB Storage -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+
+    <!-- GitHub API & App Logic -->
+    <script src="/Aman.Amna/js/github.js?v=4" defer></script>
+    <script src="/Aman.Amna/js/app.js?v=5" defer></script>
+
+    <!-- Alpine.js (Must load after app.js so adminApp is defined) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen font-sans text-gray-900" x-data="adminApp()">
+
+    <!-- Login Screen -->
+    <div x-show="!isLoggedIn" class="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Admin Login</h2>
+
+            <div x-show="errorMsg" class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 text-sm rounded"
+                x-text="errorMsg" style="display: none;"></div>
+
+            <form @submit.prevent="login" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" x-model="loginForm.password"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">GitHub Token <span
+                            class="text-xs text-gray-400 font-normal ml-1">(Optional for local testing)</span></label>
+                    <input type="password" x-model="loginForm.token"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        placeholder="ghp_...">
+                    <p class="text-xs text-gray-500 mt-1">Requires repo full access to commit changes directly. Leave
+                        blank to explore UI.</p>
+                </div>
+                <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Layout -->
+    <div x-show="isLoggedIn" style="display: none;" class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside
+            class="w-64 bg-gray-900 text-white flex flex-col shadow-xl z-10 transition-transform transform md:translate-x-0"
+            :class="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen, 'fixed inset-y-0 left-0 md:relative': true}">
+            <div class="p-5 border-b border-gray-800 flex justify-between items-center">
+                <h1 class="text-xl font-bold tracking-wider text-indigo-400">ADMIN PANEL</h1>
+                <button @click="sidebarOpen = false" class="md:hidden text-gray-400 hover:text-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" @click.prevent="switchTab('dashboard')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'dashboard', 'text-gray-300 hover:bg-gray-800 hover:text-white': currentTab !== 'dashboard' }"
+                            class="block px-6 py-3 transition duration-150">Dashboard</a>
+                    </li>
+                    <li class="px-6 py-2 text-xs uppercase text-gray-500 font-bold tracking-wider mt-4 mb-1">Content
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('blogs')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'blogs', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'blogs' }"
+                            class="block px-6 py-2 transition duration-150">Blogs</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('recipes')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'recipes', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'recipes' }"
+                            class="block px-6 py-2 transition duration-150">Recipes</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('quotes')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'quotes', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'quotes' }"
+                            class="block px-6 py-2 transition duration-150">Quotes</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('about')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'about', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'about' }"
+                            class="block px-6 py-2 transition duration-150">About</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('store')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'store', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'store' }"
+                            class="block px-6 py-2 transition duration-150">Store</a>
+                    </li>
+                    <li class="px-6 py-2 text-xs uppercase text-gray-500 font-bold tracking-wider mt-4 mb-1">Media</li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('images')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'images', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'images' }"
+                            class="block px-6 py-2 transition duration-150">Images</a>
+                    </li>
+                    <li>
+                        <a href="#" @click.prevent="switchTab('videos')"
+                            :class="{ 'bg-gray-800 text-white border-l-4 border-indigo-500': currentTab === 'videos', 'text-gray-300 hover:bg-gray-800 hover:text-white pl-7': currentTab !== 'videos' }"
+                            class="block px-6 py-2 transition duration-150">Videos</a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 bg-gray-900 border-t border-gray-800">
+                <button @click="logout"
+                    class="w-full bg-gray-800 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-150 flex items-center justify-center space-x-2">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b border-gray-200 z-0">
+                <div class="px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button @click="sidebarOpen = true" class="md:hidden mr-4 text-gray-500 hover:text-gray-700">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <h2 class="text-2xl font-bold text-gray-800 capitalize" x-text="currentTab"></h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                            <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span> Connected to GitHub
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Global Notifications -->
+            <div x-show="notification.show" x-transition.opacity
+                class="fixed top-4 right-4 z-50 p-4 rounded shadow-lg max-w-sm"
+                :class="{'bg-green-100 border-l-4 border-green-500 text-green-700': notification.type === 'success', 'bg-red-100 border-l-4 border-red-500 text-red-700': notification.type === 'error'}"
+                style="display: none;">
+                <div class="flex items-center justify-between">
+                    <p class="font-medium text-sm" x-text="notification.message"></p>
+                    <button @click="notification.show = false"
+                        class="ml-4 text-current opacity-70 hover:opacity-100">&times;</button>
+                </div>
+            </div>
+
+            <!-- Active Tab View -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+                <!-- Dashboard Tab -->
+                <div x-show="currentTab === 'dashboard'" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Stats cards -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Total Blogs</p>
+                                <p class="text-2xl font-bold text-gray-900" x-text="stats.blogs">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+                            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Total Recipes</p>
+                                <p class="text-2xl font-bold text-gray-900" x-text="stats.recipes">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Total Quotes</p>
+                                <p class="text-2xl font-bold text-gray-900" x-text="stats.quotes">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Media Files</p>
+                                <p class="text-2xl font-bold text-gray-900" x-text="stats.media">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+                            <div class="p-3 rounded-full bg-pink-100 text-pink-600 mr-4">
+                                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">About & Store Items</p>
+                                <p class="text-2xl font-bold text-gray-900" x-text="stats.about + stats.store">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generic Content Manager Tab Template -->
+                <div x-show="currentTab !== 'dashboard'"
+                    class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-full"
+                    style="display:none;">
+                    <div
+                        class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 gap-4">
+                        <div class="flex space-x-1 bg-gray-200 p-1 rounded-lg">
+                            <button @click="viewMode = 'list'"
+                                :class="{'bg-white text-gray-900 shadow': viewMode === 'list', 'text-gray-600 hover:text-gray-900': viewMode !== 'list'}"
+                                class="px-4 py-1.5 rounded-md text-sm font-medium transition duration-150">View
+                                All</button>
+                            <button @click="prepareCreate()"
+                                :class="{'bg-white text-gray-900 shadow': viewMode === 'create', 'text-gray-600 hover:text-gray-900': viewMode !== 'create'}"
+                                class="px-4 py-1.5 rounded-md text-sm font-medium transition duration-150">Add
+                                New</button>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button @click="refreshCurrentTab()"
+                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg class="h-4 w-4 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- List View -->
+                    <div x-show="viewMode === 'list'" class="flex-1 overflow-y-auto">
+                        <div x-show="isLoading" class="flex flex-col items-center justify-center py-16 text-gray-500">
+                            <svg class="animate-spin h-8 w-8 text-indigo-500 mb-4" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <p>Loading contents from GitHub...</p>
+                        </div>
+                        <div x-show="!isLoading && contents.length === 0"
+                            class="flex flex-col items-center justify-center py-16 text-gray-500">
+                            <svg class="h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                            </svg>
+                            <p class="text-lg font-medium text-gray-900">No content found</p>
+                            <p class="mt-1 text-sm text-gray-500">Get started by creating a new file.</p>
+                            <button @click="prepareCreate()"
+                                class="mt-4 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Create
+                                New</button>
+                        </div>
+
+                        <!-- Table for text content -->
+                        <table x-show="!isLoading && contents.length > 0 && !['images', 'videos'].includes(currentTab)"
+                            class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Filename</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <template x-for="file in contents" :key="file.sha">
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
+                                            <svg class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            <span x-text="file.name"></span>
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                                            <button @click="prepareEdit(file)"
+                                                class="text-indigo-600 hover:text-indigo-900 font-medium">Edit</button>
+                                            <button @click="deleteFile(file)"
+                                                class="text-red-600 hover:text-red-900 font-medium disabled:opacity-50"
+                                                :disabled="isDeleting === file.sha">
+                                                <span x-show="isDeleting !== file.sha">Delete</span>
+                                                <span x-show="isDeleting === file.sha">...</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+
+                        <!-- Grid for media -->
+                        <div x-show="!isLoading && contents.length > 0 && ['images', 'videos'].includes(currentTab)"
+                            class="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            <template x-for="file in contents" :key="file.sha">
+                                <div
+                                    class="border border-gray-200 rounded-lg overflow-hidden group relative bg-gray-50 hover:shadow-md transition">
+                                    <div
+                                        class="aspect-w-1 aspect-h-1 flex justify-center items-center h-32 bg-gray-100 p-2">
+                                        <template x-if="currentTab === 'images'">
+                                            <img :src="file.download_url"
+                                                class="object-contain w-full h-full rounded shadow-sm">
+                                        </template>
+                                        <template x-if="currentTab === 'videos'">
+                                            <video :src="file.download_url"
+                                                class="object-contain w-full h-full rounded shadow-sm"></video>
+                                        </template>
+                                    </div>
+                                    <div class="p-3 border-t border-gray-100">
+                                        <p class="text-xs text-gray-700 font-medium truncate" :title="file.name"
+                                            x-text="file.name"></p>
+                                    </div>
+                                    <div
+                                        class="absolute inset-0 bg-black bg-opacity-60 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div class="flex space-x-2">
+                                            <a :href="file.download_url" target="_blank"
+                                                class="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-200"
+                                                title="View Full">
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                </svg>
+                                            </a>
+                                            <button @click="deleteFile(file)"
+                                                class="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 disabled:opacity-50"
+                                                :disabled="isDeleting === file.sha" title="Delete">
+                                                <svg x-show="isDeleting !== file.sha" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <svg x-show="isDeleting === file.sha"
+                                                    class="animate-spin h-4 w-4 text-white"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                        stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor"
+                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Editor View -->
+                    <div x-show="viewMode === 'create' || viewMode === 'edit'"
+                        class="p-6 overflow-y-auto flex-1 bg-white">
+                        <div class="max-w-4xl mx-auto container">
+                            <h3 class="text-xl font-bold text-gray-900 mb-6"
+                                x-text="(viewMode === 'create' ? 'Create New ' : 'Edit ') + (['about', 'store'].includes(currentTab) ? currentTab.charAt(0).toUpperCase() + currentTab.slice(1) : currentTab.slice(0, -1))">
+                            </h3>
+
+                            <form @submit.prevent="saveContent" class="space-y-6">
+                                <!-- Blogs / Recipes Title Field -->
+                                <div x-show="['blogs', 'recipes'].includes(currentTab)">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Title</label>
+                                    <input type="text" x-model="editorForm.title" :disabled="viewMode === 'edit'"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 transition font-mono text-sm"
+                                        placeholder="e.g., My Awesome Post"
+                                        :required="['blogs', 'recipes'].includes(currentTab)">
+                                    <p x-show="viewMode === 'edit'"
+                                        class="text-xs text-gray-500 mt-2 flex items-center">
+                                        <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg> Title cannot be changed during editing to preserve the file history.
+                                        Create a new entry to rename.
+                                    </p>
+                                </div>
+
+                                <!-- Quotes Fields -->
+                                <div x-show="currentTab === 'quotes'" class="space-y-6">
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Author
+                                            Name</label>
+                                        <input type="text" x-model="editorForm.author" :disabled="viewMode === 'edit'"
+                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 transition font-mono text-sm"
+                                            placeholder="e.g., Steve Jobs" :required="currentTab === 'quotes'">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-semibold text-gray-700 mb-1">Quote Text</label>
+                                        <textarea x-model="editorForm.content" rows="4"
+                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                                            placeholder="The only way to do great work is to love what you do."
+                                            :required="currentTab === 'quotes'"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Filename Field (Media or Static Pages) -->
+                                <div x-show="['images', 'videos', 'about', 'store'].includes(currentTab)">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">Filename <span
+                                            class="text-indigo-500 ml-1 text-xs font-normal"
+                                            x-show="['about', 'store'].includes(currentTab)">fixed .md</span></label>
+                                    <input type="text" x-model="editorForm.filename"
+                                        :disabled="['about', 'store'].includes(currentTab) || viewMode === 'edit' || (viewMode === 'create' && ['images','videos'].includes(currentTab) && editorForm.fileObj)"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 transition font-mono text-sm"
+                                        placeholder="Auto-generated or fixed filename"
+                                        :required="['images', 'videos', 'about', 'store'].includes(currentTab)">
+                                </div>
+
+                                <!-- Text Editor (Blogs/Recipes/About/Store) -->
+                                <div x-show="['blogs', 'recipes', 'about', 'store'].includes(currentTab)">
+                                    <div class="flex justify-between items-end mb-2">
+                                        <label class="block text-sm font-semibold text-gray-700">Content</label>
+
+                                        <div class="flex items-center space-x-2">
+                                            <!-- Standard Inline Image Insert -->
+                                            <label
+                                                class="cursor-pointer inline-flex items-center text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-md hover:bg-indigo-100 transition border border-indigo-200 shadow-sm"
+                                                x-show="viewMode !== 'list'">
+                                                <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                </svg>
+                                                <span x-show="!isUploadingInEditor">Insert Local Image</span>
+                                                <span x-show="isUploadingInEditor"
+                                                    class="animate-pulse">Uploading...</span>
+                                                <input type="file" accept="image/*" class="hidden"
+                                                    @change="uploadImageToEditor($event, false)"
+                                                    :disabled="isUploadingInEditor">
+                                            </label>
+
+                                            <!-- Special Thumbnail Insert -->
+                                            <label
+                                                class="cursor-pointer inline-flex items-center text-xs font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-md hover:bg-amber-100 transition border border-amber-200 shadow-sm"
+                                                x-show="(viewMode !== 'list') && (currentTab === 'recipes' || currentTab === 'blogs')">
+                                                <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                </svg>
+                                                <span x-show="!isUploadingInEditor">Set as Thumbnail</span>
+                                                <span x-show="isUploadingInEditor"
+                                                    class="animate-pulse">Uploading...</span>
+                                                <input type="file" accept="image/*" class="hidden"
+                                                    @change="uploadImageToEditor($event, true)"
+                                                    :disabled="isUploadingInEditor">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- SimpleMDE container for Markdowns -->
+                                    <div x-ignore>
+                                        <textarea id="markdown-editor" class="w-full"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- Media Upload (Images/Videos) -->
+                                <div x-show="['images', 'videos'].includes(currentTab)"
+                                    class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                    <label class="block text-sm font-semibold text-gray-700 mb-3">Select Media
+                                        File</label>
+                                    <div
+                                        class="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center bg-white hover:bg-gray-50 transition border-indigo-200 hover:border-indigo-400">
+                                        <div class="space-y-2 text-center">
+                                            <div
+                                                class="mx-auto flex items-center justify-center h-16 w-16 bg-indigo-100 rounded-full mb-4">
+                                                <svg class="h-8 w-8 text-indigo-600" stroke="currentColor" fill="none"
+                                                    viewBox="0 0 48 48" aria-hidden="true">
+                                                    <path
+                                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                                        stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex justify-center text-sm text-gray-600">
+                                                <label for="file-upload"
+                                                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 px-3 py-1 border border-indigo-200 shadow-sm">
+                                                    <span>Browse files</span>
+                                                    <input id="file-upload" type="file" class="sr-only" multiple
+                                                        @change="handleFileUpload"
+                                                        :accept="currentTab === 'images' ? 'image/*' : 'video/*'">
+                                                </label>
+                                            </div>
+                                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'images'">PNG,
+                                                JPG, GIF, WebP up to 10MB</p>
+                                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'videos'">MP4
+                                                up to 5 Seconds Validation</p>
+
+                                            <!-- Error Message -->
+                                            <div x-show="mediaError"
+                                                class="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg flex items-center font-medium">
+                                                <svg class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24"
+                                                    stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span x-text="mediaError"></span>
+                                            </div>
+
+                                            <!-- Previews for Multi-upload -->
+                                            <div x-show="editorForm.mediaPreviews && editorForm.mediaPreviews.length > 0"
+                                                class="mt-6">
+                                                <p class="text-sm font-medium text-gray-700 mb-4">Selected Files Preview
+                                                </p>
+                                                <div class="flex flex-wrap gap-4 justify-center">
+                                                    <template x-for="(preview, index) in editorForm.mediaPreviews"
+                                                        :key="index">
+                                                        <div
+                                                            class="relative rounded-lg shadow-lg overflow-hidden border border-gray-200 bg-black w-32 h-32 flex-shrink-0">
+                                                            <template x-if="currentTab === 'images'">
+                                                                <img :src="preview" class="w-full h-full object-cover">
+                                                            </template>
+                                                            <template x-if="currentTab === 'videos'">
+                                                                <video :src="preview" controls
+                                                                    class="w-full h-full object-cover"></video>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-8">
+                                    <button type="button" @click="viewMode = 'list'"
+                                        class="bg-white py-2.5 px-5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                                        Cancel & Go Back
+                                    </button>
+                                    <button type="submit"
+                                        :disabled="isSaving || (['images', 'videos'].includes(currentTab) && !editorForm.mediaBase64)"
+                                        class="inline-flex justify-center flex-row items-center py-2.5 px-6 border border-transparent shadow-md text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                                        <svg x-show="isSaving" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                                stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                            </path>
+                                        </svg>
+                                        <span x-show="!isSaving"
+                                            x-text="viewMode === 'create' ? 'Save & Publish to GitHub' : 'Update Content in GitHub'"></span>
+                                        <span x-show="isSaving">Committing to GitHub...</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>

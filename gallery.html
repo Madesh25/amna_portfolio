@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amna's World | Premium Edition</title>
+  <meta name="description" content="A curated collection of recipes, blogs, quotes, and memories.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+
+  <!-- FontAwesome & Phosphor Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Core Stylesheet -->
+  <link href="/css/main.css" rel="stylesheet">
+
+  <!-- Dynamic Content Libraries -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="/Aman.Amna/js/github.js?v=3"></script>
+  <script src="/js/publicApp.js?v=3"></script>
+</head>
+
+<body x-data="publicApp()" x-init="initApp()" class="loading">
+
+  <!-- Ambient RM Watermark & Background Images -->
+  <div class="bg-collage">
+    <div class="bg-image strawberry-bg"></div>
+    <div class="bg-image rm-bg"></div>
+  </div>
+  <div class="rm-watermark">
+    <i class="ph-fill ph-crown"></i>
+  </div>
+  <div class="ambient-glow"></div>
+
+  <!-- Preloader Screen -->
+  <div id="preloader" x-show="isLoading" x-transition.opacity.duration.500ms>
+    <div class="loader-content">
+      <i class="ph-fill ph-soccer-ball rolling-football"></i>
+    </div>
+  </div>
+
+  <!-- Premium Glass Navbar -->
+  <header class="glass-nav">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="logo-main">Amna's</span>
+        <span class="logo-accent">World</span>
+      </a>
+
+      <!-- Desktop Menu -->
+      <nav class="desktop-nav">
+        <a href="recipes.html">Recipes</a>
+        <a href="blogs.html">Blogs</a>
+        <a href="quotes.html">Quotes</a>
+        <a href="gallery.html" style="color: var(--strawberry);">Gallery</a>
+        <a href="about.html">About</a>
+        <a href="store.html">Store</a>
+        <!-- Admin button removed as requested -->
+      </nav>
+
+      <!-- Mobile Hamburger -->
+      <div x-data="{ open: false }" class="mobile-menu-wrapper">
+        <button @click="open = !open" class="hamburger-btn">
+          <i class="ph ph-list" x-show="!open"></i>
+          <i class="ph ph-x" x-show="open" style="display: none;"></i>
+        </button>
+
+        <nav class="mobile-nav" x-show="open" @click.away="open = false" x-transition>
+          <a href="recipes.html" @click="open = false">Recipes</a>
+          <a href="blogs.html" @click="open = false">Blogs</a>
+          <a href="quotes.html" @click="open = false">Quotes</a>
+          <a href="gallery.html" style="color: var(--strawberry);" @click="open = false">Gallery</a>
+          <a href="about.html" @click="open = false">About</a>
+          <a href="store.html" @click="open = false">Store</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section Mini -->
+  <section class="hero-section" id="home" style="min-height: 40vh; align-items: flex-end; padding-bottom: 2rem;">
+    <div class="hero-content">
+      <div class="hero-badges">
+        <span class="badge rm-badge"><i class="ph-fill ph-trophy"></i> HALA MADRID</span>
+        <span class="badge strawberry-badge"><i class="ph-fill ph-heart"></i> BAKED WITH LOVE</span>
+      </div>
+      <h1 class="hero-title reveal-text">
+        Amna's <span class="strawberry-text">World</span>
+      </h1>
+      <!-- Removed the requested descriptive text -->
+      <a href="#bento-grid" class="scroll-down-btn fade-in-up">
+        <span>Discover</span>
+        <i class="ph ph-arrow-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Marquee Removed for Dedicated Sub-Page -->
+
+  <main class="main-content" id="bento-grid">
+    <div class="bento-container" style="display: block; max-width: 800px; margin: 0 auto;">
+
+      <!-- Removed Quotes and Recipes for the Gallery Page -->
+
+      <!-- ==========================================
+           BENTO BOX 3: Feline Friends (Image Masonry)
+           ========================================== -->
+      <div id="gallery" class="bento-card bento-cats glass-panel hover-gold">
+        <div class="card-header">
+          <h3><i class="ph-fill ph-cat gold-icon"></i> Finesse & Paws</h3>
+        </div>
+
+        <div class="bento-gallery">
+          <template x-if="images.length === 0 && !isLoading">
+            <div class="empty-state-mini center">
+              <i class="ph ph-image"></i>
+              <p>No photos yet.</p>
+            </div>
+          </template>
+
+          <template x-for="img in images" :key="img.download_url">
+            <div class="bento-img-wrap">
+              <img :src="img.download_url" :alt="img.name" loading="lazy">
+              <div class="img-overlay">
+                <span x-text="img.name.split('.')[0]"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Removed Blogs for the Gallery Page -->
+
+      <!-- ==========================================
+           BENTO BOX 5: RM Tribute Mini Card
+           ========================================== -->
+      <div class="bento-card bento-madrid glass-panel center-content rm-glow">
+        <i class="ph-fill ph-trophy gold-icon giant-icon"></i>
+        <h3 class="gold-text">Los Blancos</h3>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="premium-footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Amna's World</div>
+      <!-- Removed tagline as requested -->
+
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i class="ph-fill ph-instagram-logo"></i></a>
+        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i class="ph-fill ph-telegram-logo"></i></a>
+        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i class="ph-fill ph-pinterest-logo"></i></a>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2024 Amna. All Rights Reserved.</p>
+        <p class="gold-text">¡Hala Madrid y nada más!</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Subtly track mouse movement over bento cards for the frosted glow effect
+    document.querySelectorAll('.bento-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect(),
+          x = e.clientX - rect.left,
+          y = e.clientY - rect.top;
+        card.style.setProperty('--mouse-x', `${x}px`);
+        card.style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+  </script>
+</body>
+
+</html>
