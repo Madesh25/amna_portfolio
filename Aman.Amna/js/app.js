@@ -479,19 +479,21 @@ function adminApp() {
 
             try {
                 if (['images', 'videos'].includes(this.currentTab)) {
-                    // Multi-upload handler
-                    let uploadPromises = [];
+                    // Multi-upload handler (Must be sequential to prevent GitHub API 409 tree conflicts)
+                    let successCount = 0;
                     for (const media of this.editorForm.mediaBase64s) {
                         // Generate a unique timestamped filename for each to prevent overwriting during batch upload
+                        // Use a slight artificial delay for the timestamp just in case loop is too fast
+                        await new Promise(r => setTimeout(r, 100));
                         const uniqueFilename = `${Date.now()}-${media.name}`;
                         const path = this.currentTab === 'images' ? `img/photos/${uniqueFilename}` : `content/${this.currentTab}/${uniqueFilename}`;
                         const message = `Upload ${this.currentTab.slice(0, -1)}: ${uniqueFilename}`;
 
-                        uploadPromises.push(this.api.saveFile(path, media.data, message, null, true));
+                        await this.api.saveFile(path, media.data, message, null, true);
+                        successCount++;
                     }
 
-                    await Promise.all(uploadPromises);
-                    this.showNotification(`Successfully uploaded ${uploadPromises.length} files!`, 'success');
+                    this.showNotification(`Successfully uploaded ${successCount} files!`, 'success');
 
                 } else {
                     // Standard single document save handler (blogs, recipes, quotes, about, store)
