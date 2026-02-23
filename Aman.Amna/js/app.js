@@ -158,7 +158,7 @@ function adminApp() {
                     this.api.getContents('content/blogs'),
                     this.api.getContents('content/recipes'),
                     this.api.getContents('content/quotes'),
-                    this.api.getContents('content/images'),
+                    this.api.getContents('img/photos'),
                     this.api.getContents('content/videos'),
                     this.api.getContents('content/about'),
                     this.api.getContents('content/store')
@@ -180,7 +180,8 @@ function adminApp() {
             this.contents = [];
 
             try {
-                const path = `content/${this.currentTab}`;
+                let path = `content/${this.currentTab}`;
+                if (this.currentTab === 'images') path = 'img/photos';
                 const data = await this.api.getContents(path);
                 this.contents = data;
             } catch (err) {
@@ -233,7 +234,8 @@ function adminApp() {
             this.isLoading = true;
 
             try {
-                const path = `content/${this.currentTab}/${file.name}`;
+                let path = `content/${this.currentTab}/${file.name}`;
+                if (this.currentTab === 'images') path = `img/photos/${file.name}`;
 
                 if (['images', 'videos'].includes(this.currentTab)) {
                     // For media, we just show the preview, don't download bits again
@@ -353,7 +355,8 @@ function adminApp() {
                 // Generate safe filename with timestamp
                 const cleanName = file.name.replace(/\s+/g, '-').toLowerCase();
                 const filename = `${Date.now()}-${cleanName}`;
-                const path = `content/images/${filename}`;
+                // Direct markdown inline uploads to the same active folder
+                const path = `img/photos/${filename}`;
 
                 // Read file as Base64 format for API
                 const base64Data = await new Promise((resolve, reject) => {
@@ -367,7 +370,7 @@ function adminApp() {
                 await this.api.saveFile(path, base64Data, `Upload inline image: ${filename}`, null, true);
 
                 // Construct relative markdown path based on repo architecture
-                const markdownImageSyntax = `\n![${isThumbnail ? "thumbnail" : cleanName}](/content/images/${filename})\n`;
+                const markdownImageSyntax = `\n![${isThumbnail ? "thumbnail" : cleanName}](/img/photos/${filename})\n`;
 
                 // Inject markdown directly at cursor using SimpleMDE API
                 if (this.editor) {
@@ -402,8 +405,15 @@ function adminApp() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 this.editorForm.mediaPreview = e.target.result;
-                // Cut off the data:image/png;base64, prefix
-                this.editorForm.mediaBase64 = e.target.result.split(',')[1];
+                const baseData = e.target.result.split(',')[1];
+                this.editorForm.mediaBase64 = baseData;
+
+                // Track for multi-file upload save handler
+                if (!this.editorForm.mediaBase64s) this.editorForm.mediaBase64s = [];
+                this.editorForm.mediaBase64s.push({
+                    name: file.name.replace(/\s+/g, '-').toLowerCase(),
+                    data: baseData
+                });
             };
             reader.readAsDataURL(file);
         },
@@ -473,8 +483,8 @@ function adminApp() {
                     let uploadPromises = [];
                     for (const media of this.editorForm.mediaBase64s) {
                         // Generate a unique timestamped filename for each to prevent overwriting during batch upload
-                        const uniqueFilename = `${Date.now()}-${Math.floor(Math.random() * 1000)}-${media.name}`;
-                        const path = `content/${this.currentTab}/${uniqueFilename}`;
+                        const uniqueFilename = `${Date.now()}-${media.name}`;
+                        const path = this.currentTab === 'images' ? `img/photos/${uniqueFilename}` : `content/${this.currentTab}/${uniqueFilename}`;
                         const message = `Upload ${this.currentTab.slice(0, -1)}: ${uniqueFilename}`;
 
                         uploadPromises.push(this.api.saveFile(path, media.data, message, null, true));
@@ -519,7 +529,8 @@ function adminApp() {
             }
 
             this.isDeleting = file.sha;
-            const path = `content/${this.currentTab}/${file.name}`;
+            let path = `content/${this.currentTab}/${file.name}`;
+            if (this.currentTab === 'images') path = `img/photos/${file.name}`;
             const message = `Delete ${this.currentTab.slice(0, -1)}: ${file.name}`;
 
             try {

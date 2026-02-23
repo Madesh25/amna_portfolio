@@ -83,7 +83,7 @@ function publicApp() {
 
         async fetchImages() {
             try {
-                const rawImages = await this.api.getContents('content/images');
+                const rawImages = await this.api.getContents('img/photos');
                 if (Array.isArray(rawImages) && rawImages.length > 0) {
                     this.images = rawImages;
                 }
@@ -138,7 +138,7 @@ function publicApp() {
 
                                 if (urlMatch && urlMatch[1]) {
                                     const localPath = urlMatch[1];
-                                    if (localPath.startsWith('/content/images/')) {
+                                    if (localPath.startsWith('/img/photos/')) {
                                         const filename = localPath.split('/').pop();
                                         const imgInGallery = this.images.find(img => img.name === filename);
 
