@@ -106,7 +106,7 @@
   <!-- Marquee Removed for Dedicated Sub-Page -->
 
   <main class="main-content" id="bento-grid">
-    <div class="bento-container" style="display: block; max-width: 800px; margin: 0 auto;">
+    <div class="bento-container" style="display: block; max-width: 1400px; width: 95%; margin: 0 auto;">
 
       <!-- Removed Quotes and Recipes for the Gallery Page -->
 
@@ -129,9 +129,6 @@
           <template x-for="img in images" :key="img.download_url">
             <div class="bento-img-wrap">
               <img :src="img.download_url" :alt="img.name" loading="lazy">
-              <div class="img-overlay">
-                <span x-text="img.name.split('.')[0]"></span>
-              </div>
             </div>
           </template>
         </div>
@@ -157,9 +154,12 @@
       <!-- Removed tagline as requested -->
 
       <div class="footer-socials">
-        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i class="ph-fill ph-instagram-logo"></i></a>
-        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i class="ph-fill ph-telegram-logo"></i></a>
-        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i class="ph-fill ph-pinterest-logo"></i></a>
+        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-instagram-logo"></i></a>
+        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-telegram-logo"></i></a>
+        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-pinterest-logo"></i></a>
       </div>
 
       <div class="footer-bottom">
