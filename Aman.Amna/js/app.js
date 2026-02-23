@@ -1,7 +1,7 @@
 // app.js
 // Main application logic for the Admin Dashboard
 
-const HARDCODED_PASSWORD = 'admin'; // Replace with complex password if needed
+const HARDCODED_PASSWORD = 'GOAT@MESSI'; // Required custom password
 
 function adminApp() {
     return {
@@ -91,22 +91,22 @@ function adminApp() {
             }
 
             try {
-                if (this.loginForm.token) {
-                    // Initialize API token
-                    this.api.setToken(this.loginForm.token);
-
-                    // Fetch user logic to confirm token works
-                    const user = await this.api.getAuthenticatedUser();
-
-                    let owner = user.login;
-                    let repo = 'amna'; // Defaulting to amna as per folder structure
-
-                    // Save to local storage
-                    this.api.setRepoInfo(owner, repo);
-                } else {
-                    console.log("Running in local view-only mode without GitHub Token.");
-                    this.api.clearToken();
+                if (!this.loginForm.token) {
+                    this.errorMsg = 'GitHub Access Token is strictly required.';
+                    return;
                 }
+
+                // Initialize API token
+                this.api.setToken(this.loginForm.token);
+
+                // Fetch user logic to confirm token works
+                const user = await this.api.getAuthenticatedUser();
+
+                let owner = user.login;
+                let repo = 'amna_portfolio'; // Explicitly bind to correct remote repository
+
+                // Save to local storage
+                this.api.setRepoInfo(owner, repo);
 
                 // Reset attempts
                 localStorage.removeItem('login_attempts');

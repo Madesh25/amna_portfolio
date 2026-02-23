@@ -186,18 +186,19 @@ button {
 
 .rolling-football {
     display: inline-block !important;
-    width: 65px;
-    height: 65px;
-    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik01MCAxNSBMNjYgMjYgTDYwIDQ1IEw0MCA0NSBMMzQgMjYgWiIgZmlsbD0iI0ZGNEQ2RCIvPjxwYXRoIGQ9Ik01MCA4NSBMNjYgNzQgTDYwIDU1IEw0MCA1NSBMMzQgNzQgWiIgZmlsbD0iI0Q0QUYzNyIvPjxwYXRoIGQ9Ik0xNSA1MCBMMjYgMzQgTDQ1IDQwIEw0NSA2MCBMMjYgNjYgWiIgZmlsbD0iIzRBOTBFMiIvPjxwYXRoIGQ9Ik04NSA1MCBMNzQgNjYgTDU1IDYwIEw1NSA0MCBMNzQgMzQgWiIgZmlsbD0iIzJFQ0M3MSIvPjxwYXRoIGQ9Ik01MCA0NSBMNjAgNTUgTDUwIDY1IEw0MCA1NSBaIiBmaWxsPSIjRkZCNkMxIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+') center center no-repeat;
-    background-size: contain;
-    color: transparent;
-    animation: worldcup-roll 2s ease-in-out infinite;
-    border-radius: 50%;
-    box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
+    width: 65px !important;
+    height: 65px !important;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik01MCAxNSBMNjYgMjYgTDYwIDQ1IEw0MCA0NSBMMzQgMjYgWiIgZmlsbD0iI0ZGNEQ2RCIvPjxwYXRoIGQ9Ik01MCA4NSBMNjYgNzQgTDYwIDU1IEw0MCA1NSBMMzQgNzQgWiIgZmlsbD0iI0Q0QUYzNyIvPjxwYXRoIGQ9Ik0xNSA1MCBMMjYgMzQgTDQ1IDQwIEw0NSA2MCBMMjYgNjYgWiIgZmlsbD0iIzRBOTBFMiIvPjxwYXRoIGQ9Ik04NSA1MCBMNzQgNjYgTDU1IDYwIEw1NSA0MCBMNzQgMzQgWiIgZmlsbD0iIzJFQ0M3MSIvPjxwYXRoIGQ9Ik01MCA0NSBMNjAgNTUgTDUwIDY1IEw0MCA1NSBaIiBmaWxsPSIjRkZCNkMxIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+') center center no-repeat !important;
+    background-size: contain !important;
+    color: transparent !important;
+    animation: worldcup-roll 2s ease-in-out infinite !important;
+    border-radius: 50% !important;
+    box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3) !important;
 }
 
 .rolling-football::before {
-    display: none;
+    content: none !important;
+    display: none !important;
 }
 
 /* Real Madrid Anthem Floating Button */
