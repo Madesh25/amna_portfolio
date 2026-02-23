@@ -809,6 +809,8 @@ button {
     gap: 1rem;
     position: relative;
     z-index: 1;
+    flex-grow: 1;
+    align-content: center;
 }
 
 .gallery-grid {

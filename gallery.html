@@ -111,37 +111,27 @@
       <!-- Removed Quotes and Recipes for the Gallery Page -->
 
       <!-- ==========================================
-           BENTO BOX 3: Feline Friends (Image Masonry)
+           FULLSCREEN GALLERY: Feline Friends & Photos (Image Masonry)
            ========================================== -->
-      <div id="gallery" class="bento-card bento-cats glass-panel hover-gold">
-        <div class="card-header">
-          <h3><i class="ph-fill ph-cat gold-icon"></i> Finesse & Paws</h3>
+      <div id="gallery">
+        <div class="card-header" style="margin-bottom: 2rem;">
+          <h3 style="font-size: 2rem;"><i class="ph-fill ph-cat gold-icon"></i> Finesse & Paws</h3>
         </div>
 
-        <div class="bento-gallery gallery-grid">
+        <div class="gallery-grid">
           <template x-if="images.length === 0 && !isLoading">
-            <div class="empty-state-mini center">
-              <i class="ph ph-image"></i>
-              <p>No photos yet.</p>
+            <div class="empty-state-mini center" style="grid-column: 1 / -1; padding: 4rem;">
+              <i class="ph ph-image" style="font-size: 3rem; color: var(--gold); margin-bottom: 1rem;"></i>
+              <p style="font-size: 1.2rem; color: var(--text-secondary);">No photos yet.</p>
             </div>
           </template>
 
           <template x-for="img in images" :key="img.download_url">
-            <div class="bento-img-wrap">
+            <div class="bento-img-wrap" style="border-radius: var(--radius-lg); box-shadow: var(--glass-shadow);">
               <img :src="img.download_url" :alt="img.name" loading="lazy">
             </div>
           </template>
         </div>
-      </div>
-
-      <!-- Removed Blogs for the Gallery Page -->
-
-      <!-- ==========================================
-           BENTO BOX 5: RM Tribute Mini Card
-           ========================================== -->
-      <div class="bento-card bento-madrid glass-panel center-content rm-glow">
-        <i class="ph-fill ph-trophy gold-icon giant-icon"></i>
-        <h3 class="gold-text">Los Blancos</h3>
       </div>
 
     </div>
