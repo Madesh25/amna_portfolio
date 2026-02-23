@@ -17,6 +17,7 @@ function publicApp() {
         about: '',
         recipeHighlights: [],
         anthemPlaying: false,
+        activeRecipe: null,
 
         initApp() {
             // Need a slight delay to ensure github.js is fully loaded

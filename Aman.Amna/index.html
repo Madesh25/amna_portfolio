@@ -356,7 +356,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <template x-for="file in contents" :key="file.sha">
+                                <template x-for="file in contents" :key="'list-' + file.sha">
                                     <tr class="hover:bg-gray-50 transition">
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 flex items-center">
@@ -386,7 +386,7 @@
                         <!-- Grid for media -->
                         <div x-show="!isLoading && contents.length > 0 && ['images', 'videos'].includes(currentTab)"
                             class="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                            <template x-for="file in contents" :key="file.sha">
+                            <template x-for="file in contents" :key="'grid-' + file.sha">
                                 <div
                                     class="border border-gray-200 rounded-lg overflow-hidden group relative bg-gray-50 hover:shadow-md transition">
                                     <div
