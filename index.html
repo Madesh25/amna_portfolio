@@ -123,13 +123,8 @@
 
     <div class="marquee-container">
       <div class="marquee-track">
-        <!-- Removed misleading fallback image as requested -->
-        <template x-if="recipeHighlights.length === 0 && !isLoading">
-          <div class="marquee-item subtle-text"
-            style="padding: 1rem; border: dashed 1px rgba(0,0,0,0.1); border-radius: var(--radius-md);">
-            Oven is warming up... No recipes yet.
-          </div>
-        </template>
+        <!-- Empty state block entirely removed per user request -->
+        <!-- Only renders actual dynamic items when available -->
 
         <template x-for="item in recipeHighlights" :key="item.img">
           <div class="marquee-item" style="flex: 0 0 auto;">
