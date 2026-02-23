@@ -39,7 +39,9 @@ class GitHubAPI {
     }
 
     async request(endpoint, method = 'GET', body = null) {
-        if (!this.token) {
+        // Enforce Mock API ONLY for write operations (PUT/DELETE) if no token is present.
+        // Publicly visible GET requests should naturally pass through to GitHub unauthenticated.
+        if (!this.token && method !== 'GET') {
             // Mock mode for local testing without token
             console.log(`[MOCK API] ${method} ${endpoint}`);
 
@@ -104,10 +106,13 @@ class GitHubAPI {
             .replace('{repo}', this.repo);
 
         const headers = {
-            'Authorization': `token ${this.token}`,
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
         };
+
+        if (this.token) {
+            headers['Authorization'] = `token ${this.token}`;
+        }
 
         const config = {
             method,

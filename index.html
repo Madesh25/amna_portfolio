@@ -123,10 +123,12 @@
 
     <div class="marquee-container">
       <div class="marquee-track">
-        <!-- Live images sourced dynamically from Markdown recipes via publicApp.js -->
+        <!-- Removed misleading fallback image as requested -->
         <template x-if="recipeHighlights.length === 0 && !isLoading">
-          <div class="marquee-item"><a href="recipes.html"><img src="/img/photos/photo_2026-02-22_02-31-05.jpg"
-                alt="Culinary Creation"></a></div>
+          <div class="marquee-item subtle-text"
+            style="padding: 1rem; border: dashed 1px rgba(0,0,0,0.1); border-radius: var(--radius-md);">
+            Oven is warming up... No recipes yet.
+          </div>
         </template>
 
         <template x-for="item in recipeHighlights" :key="item.img">
@@ -297,9 +299,12 @@
       <!-- Removed tagline as requested -->
 
       <div class="footer-socials">
-        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i class="ph-fill ph-instagram-logo"></i></a>
-        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i class="ph-fill ph-telegram-logo"></i></a>
-        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i class="ph-fill ph-pinterest-logo"></i></a>
+        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-instagram-logo"></i></a>
+        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-telegram-logo"></i></a>
+        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-pinterest-logo"></i></a>
       </div>
 
       <div class="footer-bottom">
