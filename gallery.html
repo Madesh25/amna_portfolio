@@ -43,7 +43,7 @@
   <!-- Preloader Screen -->
   <div id="preloader" x-show="isLoading" x-transition.opacity.duration.500ms>
     <div class="loader-content">
-      <i class="ph-fill ph-soccer-ball rolling-football"></i>
+      <i class="ph-fill ph-cat walking-cat"></i>
     </div>
   </div>
 
@@ -127,7 +127,9 @@
           </template>
 
           <template x-for="img in images" :key="img.download_url">
-            <div class="bento-img-wrap" style="border-radius: var(--radius-lg); box-shadow: var(--glass-shadow);">
+            <div class="bento-img-wrap"
+              style="border-radius: var(--radius-lg); box-shadow: var(--glass-shadow); cursor: pointer;"
+              @click="openLightbox(img.download_url)">
               <img :src="img.download_url" :alt="img.name" loading="lazy">
             </div>
           </template>
@@ -171,6 +173,13 @@
       });
     });
   </script>
+  <!-- Lightbox Modal -->
+  <div x-show="lightboxOpen" class="lightbox-modal" style="display: none;" @click="closeLightbox">
+    <div class="lightbox-content" @click.stop>
+      <button class="lightbox-close" @click="closeLightbox"><i class="ph ph-x"></i></button>
+      <img :src="lightboxImage" class="lightbox-img" alt="Fullscreen Image">
+    </div>
+  </div>
 </body>
 
 </html>

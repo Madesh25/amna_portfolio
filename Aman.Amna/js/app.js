@@ -183,6 +183,11 @@ function adminApp() {
                 let path = `content/${this.currentTab}`;
                 if (this.currentTab === 'images') path = 'img/photos';
                 const data = await this.api.getContents(path);
+
+                // Sort array descending to show newest uploaded timestamps first
+                if (Array.isArray(data)) {
+                    data.sort((a, b) => b.name.localeCompare(a.name));
+                }
                 this.contents = data;
             } catch (err) {
                 this.showNotification('Failed to load contents: ' + err.message, 'error');

@@ -184,21 +184,38 @@ button {
     text-align: center;
 }
 
-.rolling-football {
+.walking-cat {
     display: inline-block !important;
-    width: 65px !important;
-    height: 65px !important;
-    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik01MCAxNSBMNjYgMjYgTDYwIDQ1IEw0MCA0NSBMMzQgMjYgWiIgZmlsbD0iI0ZGNEQ2RCIvPjxwYXRoIGQ9Ik01MCA4NSBMNjYgNzQgTDYwIDU1IEw0MCA1NSBMMzQgNzQgWiIgZmlsbD0iI0Q0QUYzNyIvPjxwYXRoIGQ9Ik0xNSA1MCBMMjYgMzQgTDQ1IDQwIEw0NSA2MCBMMjYgNjYgWiIgZmlsbD0iIzRBOTBFMiIvPjxwYXRoIGQ9Ik04NSA1MCBMNzQgNjYgTDU1IDYwIEw1NSA0MCBMNzQgMzQgWiIgZmlsbD0iIzJFQ0M3MSIvPjxwYXRoIGQ9Ik01MCA0NSBMNjAgNTUgTDUwIDY1IEw0MCA1NSBaIiBmaWxsPSIjRkZCNkMxIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iNDgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+') center center no-repeat !important;
-    background-size: contain !important;
-    color: transparent !important;
-    animation: worldcup-roll 2s ease-in-out infinite !important;
-    border-radius: 50% !important;
-    box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3) !important;
+    font-size: 65px !important;
+    color: var(--gold-primary) !important;
+    animation: cat-walk 1.5s ease-in-out infinite alternate !important;
+    filter: drop-shadow(0 10px 10px rgba(212, 175, 55, 0.3));
 }
 
-.rolling-football::before {
-    content: none !important;
-    display: none !important;
+@keyframes cat-walk {
+    0% {
+        transform: translateX(-40px) translateY(0) scaleX(1);
+    }
+
+    25% {
+        transform: translateX(0px) translateY(-15px) scaleX(1);
+    }
+
+    49% {
+        transform: translateX(40px) translateY(0) scaleX(1);
+    }
+
+    50% {
+        transform: translateX(40px) translateY(0) scaleX(-1);
+    }
+
+    75% {
+        transform: translateX(0px) translateY(-15px) scaleX(-1);
+    }
+
+    100% {
+        transform: translateX(-40px) translateY(0) scaleX(-1);
+    }
 }
 
 /* Real Madrid Anthem Floating Button */
@@ -225,20 +242,6 @@ button {
     transform: scale(1.1) rotate(5deg);
     background: var(--gold-primary);
     color: white;
-}
-
-@keyframes worldcup-roll {
-    0% {
-        transform: translateX(-120px) rotate(-200deg);
-    }
-
-    50% {
-        transform: translateX(120px) rotate(200deg);
-    }
-
-    100% {
-        transform: translateX(-120px) rotate(-200deg);
-    }
 }
 
 /* ==========================================================================
@@ -817,6 +820,57 @@ button {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+}
+
+/* Lightbox Base */
+.lightbox-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.lightbox-img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    object-fit: contain;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.lightbox-close:hover {
+    transform: scale(1.2);
+    color: var(--gold-primary);
 }
 
 .bento-img-wrap {

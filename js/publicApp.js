@@ -19,6 +19,20 @@ function publicApp() {
         anthemPlaying: false,
         activeRecipe: null,
 
+        // Lightbox State
+        lightboxOpen: false,
+        lightboxImage: '',
+        openLightbox(url) {
+            this.lightboxImage = url;
+            this.lightboxOpen = true;
+            document.body.style.overflow = 'hidden';
+        },
+        closeLightbox() {
+            this.lightboxOpen = false;
+            setTimeout(() => { this.lightboxImage = ''; }, 300);
+            document.body.style.overflow = '';
+        },
+
         initApp() {
             // Need a slight delay to ensure github.js is fully loaded
             setTimeout(() => {
@@ -86,7 +100,8 @@ function publicApp() {
             try {
                 const rawImages = await this.api.getContents('img/photos');
                 if (Array.isArray(rawImages) && rawImages.length > 0) {
-                    this.images = rawImages;
+                    // Sort descending (newest timestamp first based on auto-generated filename: 177xxxxxxx-name.jpg)
+                    this.images = rawImages.sort((a, b) => b.name.localeCompare(a.name));
                 }
             } catch (err) {
                 console.warn("No images found or error fetching images.");
