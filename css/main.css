@@ -184,37 +184,72 @@ button {
     text-align: center;
 }
 
-.walking-cat {
-    display: inline-block !important;
-    font-size: 65px !important;
-    color: var(--gold-primary) !important;
-    animation: cat-walk 1.5s ease-in-out infinite alternate !important;
-    filter: drop-shadow(0 10px 10px rgba(212, 175, 55, 0.3));
+/* Walking Cat Loader — paces left-to-right endlessly */
+.loader-content {
+    position: relative;
+    width: 300px;
+    height: 90px;
+    display: flex;
+    align-items: flex-end;
 }
 
-@keyframes cat-walk {
+.walking-cat {
+    display: inline-block !important;
+    font-size: 60px !important;
+    color: var(--gold-primary) !important;
+    position: absolute;
+    bottom: 0;
+    /* Start offscreen left, walk to offscreen right, then reset */
+    animation: cat-walk-lr 2.5s linear infinite !important;
+    filter: drop-shadow(0 6px 8px rgba(212, 175, 55, 0.25));
+}
+
+@keyframes cat-walk-lr {
     0% {
-        transform: translateX(-40px) translateY(0) scaleX(1);
+        left: -70px;
+        transform: scaleX(1) translateY(0px);
     }
 
-    25% {
-        transform: translateX(0px) translateY(-15px) scaleX(1);
+    10% {
+        transform: scaleX(1) translateY(-6px);
     }
 
-    49% {
-        transform: translateX(40px) translateY(0) scaleX(1);
+    20% {
+        transform: scaleX(1) translateY(0px);
+    }
+
+    30% {
+        transform: scaleX(1) translateY(-6px);
+    }
+
+    40% {
+        transform: scaleX(1) translateY(0px);
     }
 
     50% {
-        transform: translateX(40px) translateY(0) scaleX(-1);
+        left: 370px;
+        transform: scaleX(-1) translateY(0px);
     }
 
-    75% {
-        transform: translateX(0px) translateY(-15px) scaleX(-1);
+    60% {
+        transform: scaleX(-1) translateY(-6px);
+    }
+
+    70% {
+        transform: scaleX(-1) translateY(0px);
+    }
+
+    80% {
+        transform: scaleX(-1) translateY(-6px);
+    }
+
+    90% {
+        transform: scaleX(-1) translateY(0px);
     }
 
     100% {
-        transform: translateX(-40px) translateY(0) scaleX(-1);
+        left: -70px;
+        transform: scaleX(1) translateY(0px);
     }
 }
 
@@ -818,14 +853,20 @@ button {
 
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+    .gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
     .gallery-grid {
         grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 }
 

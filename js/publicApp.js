@@ -38,9 +38,8 @@ function publicApp() {
             setTimeout(() => {
                 if (window.github) {
                     this.api = window.github;
-                    if (!this.api.owner || !this.api.repo) {
-                        this.api.setRepoInfo('Madesh25', 'amna_portfolio');
-                    }
+                    // Always force-set repo info to ensure images load correctly
+                    this.api.setRepoInfo('Madesh25', 'amna_portfolio');
                     this.fetchAllContent();
                 } else {
                     console.error("GitHub API module not found!");

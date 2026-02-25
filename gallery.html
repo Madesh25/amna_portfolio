@@ -24,8 +24,8 @@
   <!-- Dynamic Content Libraries -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="/Aman.Amna/js/github.js?v=3"></script>
-  <script src="/js/publicApp.js?v=3"></script>
+  <script src="/Aman.Amna/js/github.js?v=6"></script>
+  <script src="/js/publicApp.js?v=6"></script>
 </head>
 
 <body x-data="publicApp()" x-init="initApp()" class="loading">
@@ -113,9 +113,21 @@
       <!-- ==========================================
            FULLSCREEN GALLERY: Feline Friends & Photos (Image Masonry)
            ========================================== -->
-      <div id="gallery">
-        <div class="card-header" style="margin-bottom: 2rem;">
-          <h3 style="font-size: 2rem;"><i class="ph-fill ph-cat gold-icon"></i> Finesse & Paws</h3>
+      <div id="gallery" x-data="{ gallerySort: 'newest' }">
+        <div class="card-header"
+          style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <h3 style="font-size: 2rem; margin: 0;"><i class="ph-fill ph-cat gold-icon"></i> Finesse & Paws</h3>
+          <!-- Sort Button -->
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <span style="font-size: 0.85rem; color: var(--text-secondary);">Sort:</span>
+            <button @click="gallerySort = (gallerySort === 'newest' ? 'oldest' : 'newest')"
+              style="display: flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.9rem; border-radius: 99px; border: 1px solid var(--glass-border); background: var(--cream-panel); color: var(--text-primary); font-size: 0.85rem; cursor: pointer; transition: all 0.2s;"
+              :style="gallerySort === 'newest' ? 'background: var(--gold-primary); color: white; border-color: var(--gold-primary);' : ''">
+              <i class="ph ph-sort-descending" x-show="gallerySort === 'newest'"></i>
+              <i class="ph ph-sort-ascending" x-show="gallerySort === 'oldest'" style="display:none"></i>
+              <span x-text="gallerySort === 'newest' ? 'Newest First' : 'Oldest First'"></span>
+            </button>
+          </div>
         </div>
 
         <div class="gallery-grid">
@@ -126,7 +138,7 @@
             </div>
           </template>
 
-          <template x-for="img in images" :key="img.download_url">
+          <template x-for="img in (gallerySort === 'newest' ? images : [...images].reverse())" :key="img.download_url">
             <div class="bento-img-wrap"
               style="border-radius: var(--radius-lg); box-shadow: var(--glass-shadow); cursor: pointer;"
               @click="openLightbox(img.download_url)">
