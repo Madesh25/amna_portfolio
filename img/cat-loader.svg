@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110" width="200" height="110">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8C85A"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#A88820"/>
+    </linearGradient>
+    <linearGradient id="bellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5E088"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+    <linearGradient id="headGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#EEC84A"/>
+      <stop offset="100%" stop-color="#B89020"/>
+    </linearGradient>
+    <linearGradient id="eyeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#5a9e6a"/>
+      <stop offset="100%" stop-color="#2d6a3a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Entire body group – SMIL vertical bounce to simulate walking -->
+  <g>
+    <animateTransform attributeName="transform" type="translate"
+      values="0,0; 0,-4; 0,0; 0,-4; 0,0"
+      dur="0.6s" repeatCount="indefinite" calcMode="spline"
+      keySplines="0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1; 0.4 0 0.6 1"/>
+
+    <!-- Tail – elegant upward S-curve -->
+    <path d="M 44,78 C 30,68 16,52 24,36 C 28,26 36,24 38,32 C 34,38 28,52 40,66 C 42,70 44,74 44,78"
+      fill="#C4A030" stroke="#B89020" stroke-width="0.5"/>
+
+    <!-- Body – smooth cat silhouette -->
+    <path d="M 48,82 C 44,70 42,60 46,50 C 50,40 58,34 74,32 C 90,30 108,32 118,42 C 128,52 126,66 122,76 C 118,86 100,90 76,90 C 54,90 50,90 48,82 Z"
+      fill="url(#bodyGrad)"/>
+
+    <!-- Belly lighter patch -->
+    <path d="M 60,86 C 56,76 56,64 62,56 C 68,48 80,46 90,50 C 100,54 104,66 100,78 C 96,88 80,92 70,90 C 62,88 62,92 60,86 Z"
+      fill="url(#bellyGrad)" opacity="0.55"/>
+
+    <!-- Back haunch muscle definition -->
+    <path d="M 50,58 C 46,50 46,42 52,38 C 58,34 64,36 66,44 C 68,52 62,64 56,68 Z"
+      fill="#B89020" opacity="0.35"/>
+
+    <!-- Neck connecting body to head -->
+    <path d="M 116,52 C 122,46 128,40 132,36 C 128,44 126,54 120,60 Z"
+      fill="#C4A030"/>
+
+    <!-- Head – natural rounded cat head shape -->
+    <path d="M 122,26 C 130,14 152,14 158,26 C 164,38 160,56 150,62 C 140,68 128,64 122,54 C 116,44 114,36 122,26 Z"
+      fill="url(#headGrad)"/>
+
+    <!-- Left ear -->
+    <path d="M 126,24 C 128,12 136,6 140,10 C 136,16 132,22 128,28 Z"
+      fill="#D4AF37"/>
+    <!-- Left ear inner -->
+    <path d="M 128,23 C 130,14 136,9 138,12 C 135,16 132,20 129,26 Z"
+      fill="#e8855a" opacity="0.7"/>
+
+    <!-- Right ear -->
+    <path d="M 148,22 C 154,10 164,8 163,18 C 160,20 156,22 152,26 Z"
+      fill="#D4AF37"/>
+    <!-- Right ear inner -->
+    <path d="M 150,21 C 155,11 162,10 161,18 C 158,20 155,22 151,25 Z"
+      fill="#e8855a" opacity="0.7"/>
+
+    <!-- Left eye – almond shaped -->
+    <path d="M 130,34 C 132,29 138,28 141,31 C 143,34 142,39 138,40 C 134,41 129,38 130,34 Z"
+      fill="url(#eyeGrad)"/>
+    <!-- Left pupil -->
+    <ellipse cx="136" cy="35" rx="2.5" ry="4.5" fill="#111" transform="rotate(-5 136 35)"/>
+    <!-- Left eye shine -->
+    <circle cx="137" cy="32" r="1.4" fill="white" opacity="0.9"/>
+
+    <!-- Right eye -->
+    <path d="M 148,34 C 150,29 156,28 158,31 C 160,34 159,39 155,40 C 151,41 147,38 148,34 Z"
+      fill="url(#eyeGrad)"/>
+    <!-- Right pupil -->
+    <ellipse cx="153" cy="35" rx="2.5" ry="4.5" fill="#111" transform="rotate(-5 153 35)"/>
+    <!-- Right eye shine -->
+    <circle cx="154" cy="32" r="1.4" fill="white" opacity="0.9"/>
+
+    <!-- Nose – small triangle -->
+    <path d="M 143,46 L 140,43 L 146,43 Z" fill="#e8855a"/>
+
+    <!-- Mouth -->
+    <path d="M 143,47 Q 140,51 137,48" stroke="#8B5E3C" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M 143,47 Q 146,51 149,48" stroke="#8B5E3C" fill="none" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Chin lighter area -->
+    <ellipse cx="142" cy="55" rx="9" ry="5" fill="#F0D875" opacity="0.45"/>
+
+    <!-- Whiskers left -->
+    <line x1="128" y1="43" x2="106" y2="39" stroke="#ccc" stroke-width="0.9" opacity="0.85"/>
+    <line x1="128" y1="46" x2="106" y2="46" stroke="#ccc" stroke-width="0.9" opacity="0.85"/>
+    <line x1="129" y1="49" x2="108" y2="53" stroke="#ccc" stroke-width="0.9" opacity="0.75"/>
+
+    <!-- Whiskers right -->
+    <line x1="158" y1="43" x2="180" y2="39" stroke="#ccc" stroke-width="0.9" opacity="0.85"/>
+    <line x1="158" y1="46" x2="180" y2="46" stroke="#ccc" stroke-width="0.9" opacity="0.85"/>
+    <line x1="157" y1="49" x2="178" y2="53" stroke="#ccc" stroke-width="0.9" opacity="0.75"/>
+
+    <!-- Front legs (right, forward stride) -->
+    <!-- Front right leg – raised/forward -->
+    <path d="M 110,82 C 110,88 112,96 112,102 C 110,107 106,107 106,102 C 104,96 106,88 108,82 Z"
+      fill="#C4A030"/>
+    <!-- Paw right front -->
+    <ellipse cx="109" cy="104" rx="5.5" ry="3" fill="#B89020"/>
+
+    <!-- Front left leg – down/back -->
+    <path d="M 98,84 C 98,90 100,98 100,104 C 98,109 94,109 94,104 C 92,98 94,90 96,84 Z"
+      fill="#B89020" opacity="0.85"/>
+    <!-- Paw left front -->
+    <ellipse cx="97" cy="106" rx="5.5" ry="3" fill="#A07818" opacity="0.85"/>
+
+    <!-- Hind legs -->
+    <!-- Hind right leg – forward -->
+    <path d="M 68,84 C 66,90 64,98 64,104 C 64,109 60,109 60,104 C 58,98 60,90 62,84 Z"
+      fill="#C4A030"/>
+    <!-- Paw hind right -->
+    <ellipse cx="62" cy="106" rx="5.5" ry="3" fill="#B89020"/>
+
+    <!-- Hind left leg – back/down -->
+    <path d="M 56,82 C 54,88 52,96 52,102 C 52,107 48,107 48,102 C 46,96 48,88 50,82 Z"
+      fill="#B89020" opacity="0.85"/>
+    <!-- Paw hind left -->
+    <ellipse cx="50" cy="104" rx="5.5" ry="3" fill="#A07818" opacity="0.85"/>
+
+    <!-- Subtle stripe markings on body for texture -->
+    <path d="M 80,38 C 82,42 82,50 80,54" stroke="#B89020" stroke-width="1.5" fill="none" opacity="0.4" stroke-linecap="round"/>
+    <path d="M 90,36 C 92,40 92,50 90,56" stroke="#B89020" stroke-width="1.5" fill="none" opacity="0.35" stroke-linecap="round"/>
+    <path d="M 100,38 C 102,42 102,52 100,58" stroke="#B89020" stroke-width="1.5" fill="none" opacity="0.3" stroke-linecap="round"/>
+  </g>
+</svg>
