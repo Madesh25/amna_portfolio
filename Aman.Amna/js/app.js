@@ -499,6 +499,7 @@ function adminApp() {
                     }
 
                     this.showNotification(`Successfully uploaded ${successCount} files!`, 'success');
+                    if (this.currentTab === 'images') await this.updateImageManifest();
 
                 } else {
                     // Standard single document save handler (blogs, recipes, quotes, about, store)
@@ -544,10 +545,32 @@ function adminApp() {
                 await this.api.deleteFile(path, message, file.sha);
                 this.showNotification(`Successfully deleted ${file.name}`);
                 this.contents = this.contents.filter(c => c.sha !== file.sha);
+                if (this.currentTab === 'images') await this.updateImageManifest();
             } catch (err) {
                 this.showNotification('Failed to delete: ' + err.message, 'error');
             } finally {
                 this.isDeleting = null;
+            }
+        },
+
+        async updateImageManifest() {
+            try {
+                // Fetch current image list from GitHub
+                const files = await this.api.getContents('img/photos');
+                const names = files
+                    .filter(f => f.name !== 'manifest.json' && f.name !== '.gitkeep')
+                    .map(f => f.name)
+                    .sort((a, b) => b.localeCompare(a)); // newest first
+                const content = btoa(JSON.stringify(names, null, 2));
+                // Get existing manifest SHA to enable update (not just create)
+                let existingSha = null;
+                try {
+                    const existing = await this.api.request('/repos/{owner}/{repo}/contents/img/photos/manifest.json');
+                    existingSha = existing.sha;
+                } catch (e) { /* first time — no existing file */ }
+                await this.api.saveFile('img/photos/manifest.json', content, 'Update image manifest', existingSha, false);
+            } catch (err) {
+                console.warn('Could not update manifest.json:', err.message);
             }
         }
     }

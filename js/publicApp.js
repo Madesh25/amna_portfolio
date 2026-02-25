@@ -97,10 +97,28 @@ function publicApp() {
 
         async fetchImages() {
             try {
+                // Primary: use static manifest.json served by Cloudflare Pages (no GitHub API needed)
+                const res = await fetch(`/img/photos/manifest.json?t=${Date.now()}`);
+                if (res.ok) {
+                    const filenames = await res.json();
+                    this.images = filenames
+                        .filter(f => f !== 'manifest.json' && f !== '.gitkeep')
+                        .map(name => ({
+                            name,
+                            download_url: `/img/photos/${name}`
+                        }));
+                    return;
+                }
+            } catch (e) {
+                console.warn('manifest.json not available, falling back to GitHub API');
+            }
+            // Fallback: GitHub API (requires public repo or auth)
+            try {
                 const rawImages = await this.api.getContents('img/photos');
                 if (Array.isArray(rawImages) && rawImages.length > 0) {
-                    // Sort descending (newest timestamp first based on auto-generated filename: 177xxxxxxx-name.jpg)
-                    this.images = rawImages.sort((a, b) => b.name.localeCompare(a.name));
+                    this.images = rawImages
+                        .filter(f => f.name !== 'manifest.json')
+                        .sort((a, b) => b.name.localeCompare(a.name));
                 }
             } catch (err) {
                 console.warn("No images found or error fetching images.");
