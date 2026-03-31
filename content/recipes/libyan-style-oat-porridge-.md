@@ -1,12 +1,7 @@
-![img_20260331_204947_256.jpg](/img/photos/1774994024672-img_20260331_204947_256.jpg)
 
 
-1/2 cup ground oats
-1 cup milk
-A pinch salt
-1 tablespoon date syrup (date molasses)
-1 teaspoon olive oil
-* Optional: a sprinkle of Bsisa powder (Libyan roasted grain mix)
+
+
 
 <!-- SPLIT -->
 
