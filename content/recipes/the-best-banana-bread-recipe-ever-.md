@@ -1,5 +1,7 @@
 
-![photo_2026-03-28_15-34-33.jpg](/img/photos/1774692293405-photo_2026-03-28_15-34-33.jpg)
+![photo_2026-03-31_23-13-53.jpg](/img/photos/1774979058578-photo_2026-03-31_23-13-53.jpg)
+
+
 3 ripe bananas, = 1 ½ cups mashed banana
 ⅓ cup brown sugar
 ¼ cup honey
