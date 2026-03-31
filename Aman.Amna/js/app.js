@@ -656,8 +656,8 @@ function adminApp() {
             }
             if (!content) return;
 
-            // Match markdown image syntax: ![alt](url)
-            const regex = /!\[.*?\]\((.*?)\)/g;
+            // Match markdown image syntax: ![alt](url), handling newlines/spaces between elements
+            const regex = /!\[[\s\S]*?\]\s*\(\s*(.*?)\s*\)/g;
             const matches = [...content.matchAll(regex)];
             this.attachedImages = matches.map(m => {
                 const url = m[1];
