@@ -564,6 +564,33 @@
                                             </label>
                                         </div>
                                     </div>
+
+                                    <!-- Single Editor view for standard content -->
+                                    <div x-show="['blogs', 'about', 'store'].includes(currentTab)">
+                                        <!-- SimpleMDE container for Markdowns -->
+                                        <div x-ignore>
+                                            <textarea id="markdown-editor" class="w-full"></textarea>
+                                        </div>
+                                    </div>
+
+                                    <!-- Dual Editor for Recipes -->
+                                    <div x-show="currentTab === 'recipes'"
+                                        class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-gray-400 mb-1">INGREDIENTS</label>
+                                            <div x-ignore>
+                                                <textarea id="markdown-ingredients" class="w-full"></textarea>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-gray-400 mb-1">INSTRUCTIONS</label>
+                                            <div x-ignore>
+                                                <textarea id="markdown-instructions" class="w-full"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Attached Images Manager -->
