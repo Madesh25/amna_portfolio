@@ -236,16 +236,21 @@ function adminApp() {
             } else if (this.currentTab === 'recipes') {
                 // Initialize split Dual SimpleMDE editors
                 setTimeout(() => {
-                    if (!this.recipeIngredientsEditor) {
-                        this.recipeIngredientsEditor = new SimpleMDE({ element: document.getElementById("markdown-ingredients"), spellChecker: false, forceSync: true });
-                        this.recipeIngredientsEditor.codemirror.on("change", () => this.parseAttachedImages());
-                        this.recipeIngredientsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeIngredientsEditor);
+                    // Destroy previous instances to prevent CodeMirror cursor geometry corruption
+                    if (this.recipeIngredientsEditor) {
+                        this.recipeIngredientsEditor.toTextArea();
                     }
-                    if (!this.recipeInstructionsEditor) {
-                        this.recipeInstructionsEditor = new SimpleMDE({ element: document.getElementById("markdown-instructions"), spellChecker: false, forceSync: true });
-                        this.recipeInstructionsEditor.codemirror.on("change", () => this.parseAttachedImages());
-                        this.recipeInstructionsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeInstructionsEditor);
+                    if (this.recipeInstructionsEditor) {
+                        this.recipeInstructionsEditor.toTextArea();
                     }
+
+                    this.recipeIngredientsEditor = new SimpleMDE({ element: document.getElementById("markdown-ingredients"), spellChecker: false, forceSync: true });
+                    this.recipeIngredientsEditor.codemirror.on("change", () => this.parseAttachedImages());
+                    this.recipeIngredientsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeIngredientsEditor);
+
+                    this.recipeInstructionsEditor = new SimpleMDE({ element: document.getElementById("markdown-instructions"), spellChecker: false, forceSync: true });
+                    this.recipeInstructionsEditor.codemirror.on("change", () => this.parseAttachedImages());
+                    this.recipeInstructionsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeInstructionsEditor);
 
                     this.recipeIngredientsEditor.value(this.editorForm.ingredients || '');
                     this.recipeInstructionsEditor.value(this.editorForm.instructions || '');
@@ -256,8 +261,8 @@ function adminApp() {
                     setTimeout(() => {
                         this.recipeIngredientsEditor.codemirror.refresh();
                         this.recipeInstructionsEditor.codemirror.refresh();
-                    }, 200);
-                }, 100);
+                    }, 250);
+                }, 150);
             }
         },
 

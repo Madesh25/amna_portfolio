@@ -1177,3 +1177,8 @@ button {
 .recipe-instructions-col {
     padding: 0.5rem;
 }
+
+/* Force CodeMirror to use stable monospace fonts to prevent geometry desyncs */
+.CodeMirror {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
