@@ -36,10 +36,14 @@ function adminApp() {
         api: null,
         editor: null, // SimpleMDE instance
 
-        // Form states
         editorForm: {
             filename: '',
+            oldFilename: null,
+            title: '',
+            author: '',
             content: '',
+            ingredients: '',
+            instructions: '',
             fileObj: null,
             mediaPreview: '',
             mediaBase64: '',
@@ -50,6 +54,9 @@ function adminApp() {
         isSavingOrder: false,
         mediaError: '',
         isUploadingInEditor: false,
+        activeEditor: null,
+        recipeIngredientsEditor: null,
+        recipeInstructionsEditor: null,
 
         init() {
             this.api = window.github;
@@ -201,8 +208,8 @@ function adminApp() {
         },
 
         initEditor() {
-            if (['blogs', 'recipes', 'about', 'store'].includes(this.currentTab)) {
-                // Initialize SimpleMDE if not already initialized
+            if (['blogs', 'about', 'store'].includes(this.currentTab)) {
+                // Initialize standard SimpleMDE
                 setTimeout(() => {
                     if (this.editor) {
                         this.editor.toTextArea();
@@ -213,18 +220,42 @@ function adminApp() {
                         forceSync: true
                     });
                     this.editor.value(this.editorForm.content);
+                    this.activeEditor = this.editor;
 
                     // Parse initial attached images
                     this.parseAttachedImages();
 
-                    // Listen for changes to dynamically update attached images
-                    this.editor.codemirror.on("change", () => {
-                        this.parseAttachedImages();
-                    });
+                    // Listen for changes
+                    this.editor.codemirror.on("change", () => this.parseAttachedImages());
+                    this.editor.codemirror.on("focus", () => this.activeEditor = this.editor);
 
-                    // Force SimpleMDE to recalculate layout geometry after Alpine x-show completes
                     setTimeout(() => {
                         this.editor.codemirror.refresh();
+                    }, 200);
+                }, 100);
+            } else if (this.currentTab === 'recipes') {
+                // Initialize split Dual SimpleMDE editors
+                setTimeout(() => {
+                    if (!this.recipeIngredientsEditor) {
+                        this.recipeIngredientsEditor = new SimpleMDE({ element: document.getElementById("markdown-ingredients"), spellChecker: false, forceSync: true });
+                        this.recipeIngredientsEditor.codemirror.on("change", () => this.parseAttachedImages());
+                        this.recipeIngredientsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeIngredientsEditor);
+                    }
+                    if (!this.recipeInstructionsEditor) {
+                        this.recipeInstructionsEditor = new SimpleMDE({ element: document.getElementById("markdown-instructions"), spellChecker: false, forceSync: true });
+                        this.recipeInstructionsEditor.codemirror.on("change", () => this.parseAttachedImages());
+                        this.recipeInstructionsEditor.codemirror.on("focus", () => this.activeEditor = this.recipeInstructionsEditor);
+                    }
+
+                    this.recipeIngredientsEditor.value(this.editorForm.ingredients || '');
+                    this.recipeInstructionsEditor.value(this.editorForm.instructions || '');
+                    this.activeEditor = this.recipeIngredientsEditor;
+
+                    this.parseAttachedImages();
+
+                    setTimeout(() => {
+                        this.recipeIngredientsEditor.codemirror.refresh();
+                        this.recipeInstructionsEditor.codemirror.refresh();
                     }, 200);
                 }, 100);
             }
@@ -234,9 +265,12 @@ function adminApp() {
             this.viewMode = 'create';
             this.editorForm = {
                 filename: '',
+                oldFilename: null,
                 title: '',
                 author: '',
                 content: '',
+                ingredients: '',
+                instructions: '',
                 fileObj: null,
                 mediaPreview: '',
                 mediaBase64: '',
@@ -273,6 +307,8 @@ function adminApp() {
                     let title = file.name.replace('.md', '').split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
                     let author = '';
                     let content = fileData.content;
+                    let ingredients = '';
+                    let instructions = '';
 
                     if (this.currentTab === 'quotes') {
                         try {
@@ -280,13 +316,26 @@ function adminApp() {
                             author = parsed.author || '';
                             content = parsed.quote || '';
                         } catch (e) { }
+                    } else if (this.currentTab === 'recipes') {
+                        if (content.includes('<!-- SPLIT -->')) {
+                            const parts = content.split('<!-- SPLIT -->');
+                            ingredients = parts[0].trim();
+                            instructions = parts[1].trim();
+                        } else {
+                            // Fallback for legacy monolithic recipes
+                            ingredients = content;
+                            instructions = '';
+                        }
                     }
 
                     this.editorForm = {
                         filename: file.name,
+                        oldFilename: null,
                         title: title,
                         author: author,
                         content: content,
+                        ingredients: ingredients,
+                        instructions: instructions,
                         fileObj: null,
                         mediaPreview: '',
                         mediaBase64: '',
@@ -389,15 +438,20 @@ function adminApp() {
                 // Construct relative markdown path based on repo architecture
                 const markdownImageSyntax = `\n![${isThumbnail ? "thumbnail" : cleanName}](/img/photos/${filename})\n`;
 
-                // Inject markdown directly at cursor using SimpleMDE API
-                if (this.editor) {
-                    const cm = this.editor.codemirror;
+                // Inject markdown directly at cursor using active SimpleMDE API
+                if (this.activeEditor) {
+                    const cm = this.activeEditor.codemirror;
                     const doc = cm.getDoc();
                     const cursor = doc.getCursor();
                     doc.replaceRange(markdownImageSyntax, cursor);
                     cm.focus(); // keep focus alive
+                } else if (this.editor) { // Fallback to plain editor if no recent focus
+                    const cm = this.editor.codemirror;
+                    const doc = cm.getDoc();
+                    const cursor = doc.getCursor();
+                    doc.replaceRange(markdownImageSyntax, cursor);
+                    cm.focus();
                 } else {
-                    // Fallback to appending if simplemde failed to boot somehow
                     this.editorForm.content += markdownImageSyntax;
                 }
 
@@ -442,8 +496,14 @@ function adminApp() {
                     this.showNotification('Title is required', 'error');
                     return;
                 }
+                const generatedFilename = this.editorForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.md';
                 if (this.viewMode === 'create') {
-                    this.editorForm.filename = this.editorForm.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.md';
+                    this.editorForm.filename = generatedFilename;
+                } else if (this.viewMode === 'edit') {
+                    if (this.editorForm.filename !== generatedFilename) {
+                        this.editorForm.oldFilename = this.editorForm.filename;
+                        this.editorForm.filename = generatedFilename;
+                    }
                 }
             } else if (this.currentTab === 'quotes') {
                 if (!this.editorForm.author || !this.editorForm.content) {
@@ -463,7 +523,15 @@ function adminApp() {
             let finalContent = this.editorForm.content;
             let isBase64 = false;
 
-            if (['blogs', 'recipes', 'about', 'store'].includes(this.currentTab)) {
+            if (this.currentTab === 'recipes') {
+                const ingContent = this.recipeIngredientsEditor ? this.recipeIngredientsEditor.value() : this.editorForm.ingredients;
+                const instContent = this.recipeInstructionsEditor ? this.recipeInstructionsEditor.value() : this.editorForm.instructions;
+                if (!ingContent.trim() && !instContent.trim()) {
+                    this.showNotification('Content cannot be empty', 'error');
+                    return;
+                }
+                finalContent = ingContent + '\n\n<!-- SPLIT -->\n\n' + instContent;
+            } else if (['blogs', 'about', 'store'].includes(this.currentTab)) {
                 finalContent = this.editor ? this.editor.value() : this.editorForm.content;
                 if (!finalContent.trim()) {
                     this.showNotification('Content cannot be empty', 'error');
@@ -528,6 +596,19 @@ function adminApp() {
                         }
                     }
 
+                    // Delete old file if renaming
+                    if (this.viewMode === 'edit' && this.editorForm.oldFilename) {
+                        try {
+                            await this.api.deleteFile(`content/${this.currentTab}/${this.editorForm.oldFilename}`, `Deleting old file due to rename`, this.editorForm.sha);
+                            this.editorForm.sha = null; // Next save acts as a create
+                            this.editorForm.oldFilename = null;
+                            // Clean up local tracking
+                            this.contents = this.contents.filter(c => c.name !== this.editorForm.oldFilename);
+                        } catch (e) {
+                            console.warn('Failed to delete old file during rename:', e.message);
+                        }
+                    }
+
                     await this.api.saveFile(path, finalContent, message, this.editorForm.sha, isBase64);
                     this.showNotification(`Successfully ${this.viewMode === 'create' ? 'created' : 'updated'} content`, 'success');
                 }
@@ -566,8 +647,15 @@ function adminApp() {
         },
 
         parseAttachedImages() {
-            if (!this.editor) return;
-            const content = this.editor.value();
+            let content = '';
+            if (this.currentTab === 'recipes') {
+                if (this.recipeIngredientsEditor) content += this.recipeIngredientsEditor.value() + '\n';
+                if (this.recipeInstructionsEditor) content += this.recipeInstructionsEditor.value();
+            } else if (this.editor) {
+                content = this.editor.value();
+            }
+            if (!content) return;
+
             // Match markdown image syntax: ![alt](url)
             const regex = /!\[.*?\]\((.*?)\)/g;
             const matches = [...content.matchAll(regex)];
@@ -585,9 +673,18 @@ function adminApp() {
 
             try {
                 // 1. Remove the image tag from the Markdown editor
-                const currentContent = this.editor.value();
-                const newContent = currentContent.replace(img.fullMatch, '');
-                this.editor.value(newContent);
+                if (this.currentTab === 'recipes') {
+                    if (this.recipeIngredientsEditor && this.recipeIngredientsEditor.value().includes(img.fullMatch)) {
+                        this.recipeIngredientsEditor.value(this.recipeIngredientsEditor.value().replace(img.fullMatch, ''));
+                    }
+                    if (this.recipeInstructionsEditor && this.recipeInstructionsEditor.value().includes(img.fullMatch)) {
+                        this.recipeInstructionsEditor.value(this.recipeInstructionsEditor.value().replace(img.fullMatch, ''));
+                    }
+                } else if (this.editor) {
+                    const currentContent = this.editor.value();
+                    const newContent = currentContent.replace(img.fullMatch, '');
+                    this.editor.value(newContent);
+                }
                 this.parseAttachedImages(); // Refresh the list
 
                 // 2. Delete the physical file from GitHub

@@ -484,18 +484,10 @@
                                 <!-- Blogs / Recipes Title Field -->
                                 <div x-show="['blogs', 'recipes'].includes(currentTab)">
                                     <label class="block text-sm font-semibold text-gray-700 mb-1">Title</label>
-                                    <input type="text" x-model="editorForm.title" :disabled="viewMode === 'edit'"
+                                    <input type="text" x-model="editorForm.title"
                                         class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 transition font-mono text-sm"
                                         placeholder="e.g., My Awesome Post"
                                         :required="['blogs', 'recipes'].includes(currentTab)">
-                                    <p x-show="viewMode === 'edit'"
-                                        class="text-xs text-gray-500 mt-2 flex items-center">
-                                        <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg> Title cannot be changed during editing to preserve the file history.
-                                        Create a new entry to rename.
-                                    </p>
                                 </div>
 
                                 <!-- Quotes Fields -->
@@ -528,10 +520,11 @@
                                         :required="['images', 'videos', 'about', 'store'].includes(currentTab)">
                                 </div>
 
-                                <!-- Text Editor (Blogs/Recipes/About/Store) -->
+                                <!-- Editor Controls (Blogs/Recipes/About/Store) -->
                                 <div x-show="['blogs', 'recipes', 'about', 'store'].includes(currentTab)">
                                     <div class="flex justify-between items-end mb-2">
-                                        <label class="block text-sm font-semibold text-gray-700">Content</label>
+                                        <label class="block text-sm font-semibold text-gray-700"
+                                            x-text="currentTab === 'recipes' ? 'Recipe Content (Ingredients & Instructions)' : 'Content'"></label>
 
                                         <div class="flex items-center space-x-2">
                                             <!-- Standard Inline Image Insert -->
@@ -571,156 +564,126 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <!-- SimpleMDE container for Markdowns -->
-                                    <div x-ignore>
-                                        <textarea id="markdown-editor" class="w-full"></textarea>
-                                    </div>
-
-                                    <!-- Attached Images Manager -->
-                                    <div x-show="(currentTab === 'recipes' || currentTab === 'blogs') && attachedImages.length > 0"
-                                        class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                        <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                                            <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            Attached Images
-                                        </h4>
-                                        <div class="space-y-2">
-                                            <template x-for="img in attachedImages" :key="img.url">
-                                                <div
-                                                    class="flex items-center justify-between p-2 bg-white rounded border border-gray-100 shadow-sm">
-                                                    <div class="flex items-center space-x-3 overflow-hidden">
-                                                        <img :src="img.url"
-                                                            class="w-10 h-10 object-cover rounded shadow-sm border border-gray-100 flex-shrink-0">
-                                                        <span class="text-xs text-gray-600 font-mono truncate"
-                                                            x-text="img.filename"></span>
-                                                    </div>
-                                                    <button @click.prevent="deleteAttachedImage(img)"
-                                                        class="text-red-500 hover:text-red-700 p-1.5 bg-red-50 rounded hover:bg-red-100 transition flex-shrink-0 ml-2"
-                                                        :disabled="isDeletingImage === img.filename"
-                                                        title="Delete image from post and repository">
-                                                        <svg x-show="isDeletingImage !== img.filename" class="w-4 h-4"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2"
-                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                        <svg x-show="isDeletingImage === img.filename"
-                                                            class="w-4 h-4 animate-spin text-red-500"
-                                                            xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            viewBox="0 0 24 24">
-                                                            <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                                stroke="currentColor" stroke-width="4"></circle>
-                                                            <path class="opacity-75" fill="currentColor"
-                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                                            </path>
-                                                        </svg>
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                <!-- Media Upload (Images/Videos) -->
-                                <div x-show="['images', 'videos'].includes(currentTab)"
-                                    class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                    <label class="block text-sm font-semibold text-gray-700 mb-3">Select Media
-                                        File</label>
-                                    <div
-                                        class="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center bg-white hover:bg-gray-50 transition border-indigo-200 hover:border-indigo-400">
-                                        <div class="space-y-2 text-center">
-                                            <div
-                                                class="mx-auto flex items-center justify-center h-16 w-16 bg-indigo-100 rounded-full mb-4">
-                                                <svg class="h-8 w-8 text-indigo-600" stroke="currentColor" fill="none"
-                                                    viewBox="0 0 48 48" aria-hidden="true">
-                                                    <path
-                                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                                        stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" />
-                                                </svg>
-                                            </div>
-                                            <div class="flex justify-center text-sm text-gray-600">
-                                                <label for="file-upload"
-                                                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 px-3 py-1 border border-indigo-200 shadow-sm">
-                                                    <span>Browse files</span>
-                                                    <input id="file-upload" type="file" class="sr-only" multiple
-                                                        @change="handleFileUpload"
-                                                        :accept="currentTab === 'images' ? 'image/*' : 'video/*'">
-                                                </label>
-                                            </div>
-                                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'images'">PNG,
-                                                JPG, GIF, WebP up to 10MB</p>
-                                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'videos'">MP4
-                                                up to 5 Seconds Validation</p>
-
-                                            <!-- Error Message -->
-                                            <div x-show="mediaError"
-                                                class="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg flex items-center font-medium">
-                                                <svg class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24"
-                                                    stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                                <span x-text="mediaError"></span>
-                                            </div>
-
-                                            <!-- Previews for Multi-upload -->
-                                            <div x-show="editorForm.mediaPreviews && editorForm.mediaPreviews.length > 0"
-                                                class="mt-6">
-                                                <p class="text-sm font-medium text-gray-700 mb-4">Selected Files Preview
-                                                </p>
-                                                <div class="flex flex-wrap gap-4 justify-center">
-                                                    <template x-for="(preview, index) in editorForm.mediaPreviews"
-                                                        :key="index">
-                                                        <div
-                                                            class="relative rounded-lg shadow-lg overflow-hidden border border-gray-200 bg-black w-32 h-32 flex-shrink-0">
-                                                            <template x-if="currentTab === 'images'">
-                                                                <img :src="preview" class="w-full h-full object-cover">
-                                                            </template>
-                                                            <template x-if="currentTab === 'videos'">
-                                                                <video :src="preview" controls
-                                                                    class="w-full h-full object-cover"></video>
-                                                            </template>
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-8">
-                                    <button type="button" @click="viewMode = 'list'"
-                                        class="bg-white py-2.5 px-5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
-                                        Cancel & Go Back
-                                    </button>
-                                    <button type="submit"
-                                        :disabled="isSaving || (['images', 'videos'].includes(currentTab) && !editorForm.mediaBase64)"
-                                        class="inline-flex justify-center flex-row items-center py-2.5 px-6 border border-transparent shadow-md text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition">
-                                        <svg x-show="isSaving" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <!-- Attached Images Manager -->
+                                <div x-show="(currentTab === 'recipes' || currentTab === 'blogs') && attachedImages.length > 0"
+                                    class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        <svg x-show="isDeletingImage === img.filename"
+                                            class="w-4 h-4 animate-spin text-red-500" xmlns="http://www.w3.org/2000/svg"
+                                            fill="none" viewBox="0 0 24 24">
                                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                                 stroke-width="4"></circle>
                                             <path class="opacity-75" fill="currentColor"
                                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                                             </path>
                                         </svg>
-                                        <span x-show="!isSaving"
-                                            x-text="viewMode === 'create' ? 'Save & Publish to GitHub' : 'Update Content in GitHub'"></span>
-                                        <span x-show="isSaving">Committing to GitHub...</span>
-                                    </button>
+                                        </button>
                                 </div>
-                            </form>
+                                </template>
                         </div>
                     </div>
-
                 </div>
+
+                <!-- Media Upload (Images/Videos) -->
+                <div x-show="['images', 'videos'].includes(currentTab)"
+                    class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Select Media
+                        File</label>
+                    <div
+                        class="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center bg-white hover:bg-gray-50 transition border-indigo-200 hover:border-indigo-400">
+                        <div class="space-y-2 text-center">
+                            <div
+                                class="mx-auto flex items-center justify-center h-16 w-16 bg-indigo-100 rounded-full mb-4">
+                                <svg class="h-8 w-8 text-indigo-600" stroke="currentColor" fill="none"
+                                    viewBox="0 0 48 48" aria-hidden="true">
+                                    <path
+                                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="flex justify-center text-sm text-gray-600">
+                                <label for="file-upload"
+                                    class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 px-3 py-1 border border-indigo-200 shadow-sm">
+                                    <span>Browse files</span>
+                                    <input id="file-upload" type="file" class="sr-only" multiple
+                                        @change="handleFileUpload"
+                                        :accept="currentTab === 'images' ? 'image/*' : 'video/*'">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'images'">PNG,
+                                JPG, GIF, WebP up to 10MB</p>
+                            <p class="text-xs text-gray-500 pt-2" x-show="currentTab === 'videos'">MP4
+                                up to 5 Seconds Validation</p>
+
+                            <!-- Error Message -->
+                            <div x-show="mediaError"
+                                class="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg flex items-center font-medium">
+                                <svg class="h-5 w-5 mr-2 text-red-500" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span x-text="mediaError"></span>
+                            </div>
+
+                            <!-- Previews for Multi-upload -->
+                            <div x-show="editorForm.mediaPreviews && editorForm.mediaPreviews.length > 0" class="mt-6">
+                                <p class="text-sm font-medium text-gray-700 mb-4">Selected Files Preview
+                                </p>
+                                <div class="flex flex-wrap gap-4 justify-center">
+                                    <template x-for="(preview, index) in editorForm.mediaPreviews" :key="index">
+                                        <div
+                                            class="relative rounded-lg shadow-lg overflow-hidden border border-gray-200 bg-black w-32 h-32 flex-shrink-0">
+                                            <template x-if="currentTab === 'images'">
+                                                <img :src="preview" class="w-full h-full object-cover">
+                                            </template>
+                                            <template x-if="currentTab === 'videos'">
+                                                <video :src="preview" controls
+                                                    class="w-full h-full object-cover"></video>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200 mt-8">
+                    <button type="button" @click="viewMode = 'list'"
+                        class="bg-white py-2.5 px-5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition">
+                        Cancel & Go Back
+                    </button>
+                    <button type="submit"
+                        :disabled="isSaving || (['images', 'videos'].includes(currentTab) && !editorForm.mediaBase64)"
+                        class="inline-flex justify-center flex-row items-center py-2.5 px-6 border border-transparent shadow-md text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        <svg x-show="isSaving" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <span x-show="!isSaving"
+                            x-text="viewMode === 'create' ? 'Save & Publish to GitHub' : 'Update Content in GitHub'"></span>
+                        <span x-show="isSaving">Committing to GitHub...</span>
+                    </button>
+                </div>
+                </form>
             </div>
-        </main>
+    </div>
+
+    </div>
+    </div>
+    </main>
     </div>
 
 </body>

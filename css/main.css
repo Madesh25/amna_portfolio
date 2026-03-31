@@ -1147,3 +1147,33 @@ button {
         font-size: 80vw;
     }
 }
+
+/* --------------------------------------------------------------------------
+   RECIPE STRUCTURAL 2-COLUMN LAYOUT
+   -------------------------------------------------------------------------- */
+.recipe-two-column-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+    .recipe-two-column-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+}
+
+.recipe-ingredients-col {
+    background: rgba(255, 251, 240, 0.4);
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(220, 190, 80, 0.15);
+    height: fit-content;
+}
+
+.recipe-instructions-col {
+    padding: 0.5rem;
+}

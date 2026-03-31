@@ -211,11 +211,31 @@ function publicApp() {
                             });
                         }
 
+                        let finalHtml = '';
+                        if (folderName === 'recipes' && rawContent.includes('<!-- SPLIT -->')) {
+                            const parts = rawContent.split('<!-- SPLIT -->');
+                            const ingHtml = window.marked ? window.marked.parse(parts[0]) : parts[0];
+                            const instHtml = window.marked ? window.marked.parse(parts[1]) : parts[1];
+                            finalHtml = `
+                            <div class="recipe-two-column-layout">
+                                <div class="recipe-ingredients-col">
+                                    <h3 class="strawberry-text" style="font-family: var(--font-heading); margin-top:0;">Ingredients</h3>
+                                    ${ingHtml}
+                                </div>
+                                <div class="recipe-instructions-col">
+                                    <h3 class="gold-text" style="font-family: var(--font-heading); margin-top:0;">Instructions</h3>
+                                    ${instHtml}
+                                </div>
+                            </div>`;
+                        } else {
+                            finalHtml = window.marked ? window.marked.parse(rawContent) : rawContent;
+                        }
+
                         return {
                             id: file.sha,
                             filename: file.name,
                             title: filenameTitle,
-                            htmlContent: window.marked ? window.marked.parse(rawContent) : rawContent,
+                            htmlContent: finalHtml,
                             highlightImg: highlightImg,
                             date: new Date().toLocaleDateString()
                         };

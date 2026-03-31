@@ -152,7 +152,7 @@
                     }
                   </style>
                   <div class="item-preview subtle-text" x-html="r.htmlContent"
-                    style="max-height: 45px; overflow: hidden; pointer-events: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+                    style="max-height: 45px; overflow: hidden; pointer-events: none; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical;">
                   </div>
                 </div>
 
@@ -196,7 +196,8 @@
                 max-width: 400px;
                 /* Constrain image size greatly to prioritize text */
                 width: 100%;
-                height: auto;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
                 border-radius: var(--radius-md);
                 margin: 1.5rem auto;
                 display: block;
@@ -238,9 +239,12 @@
       <!-- Removed tagline as requested -->
 
       <div class="footer-socials">
-        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i class="ph-fill ph-instagram-logo"></i></a>
-        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i class="ph-fill ph-telegram-logo"></i></a>
-        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i class="ph-fill ph-pinterest-logo"></i></a>
+        <a href="https://www.instagram.com/nono138700?igsh=cTcyMGNoZzl4cGpy" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-instagram-logo"></i></a>
+        <a href="https://t.me/Anooquotes" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-telegram-logo"></i></a>
+        <a href="https://pin.it/4EUguFlcz" target="_blank" class="glass-icon"><i
+            class="ph-fill ph-pinterest-logo"></i></a>
       </div>
 
       <div class="footer-bottom">
