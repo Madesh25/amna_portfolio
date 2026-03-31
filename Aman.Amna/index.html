@@ -303,6 +303,35 @@
                                 New</button>
                         </div>
                         <div class="flex space-x-2">
+                            <!-- Image Sort Controls -->
+                            <div x-show="currentTab === 'images' && viewMode === 'list'"
+                                class="flex space-x-2 items-center border-r border-gray-300 pr-2 mr-1">
+                                <select x-model="imageSortOrder" @change="sortImages()"
+                                    class="text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 py-1.5 pl-3 pr-8">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="az">Name (A-Z)</option>
+                                    <option value="za">Name (Z-A)</option>
+                                </select>
+                                <button @click="saveImageOrder()" :disabled="isSavingOrder"
+                                    class="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition">
+                                    <svg x-show="!isSavingOrder" class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                    </svg>
+                                    <svg x-show="isSavingOrder" class="animate-spin w-4 h-4 mr-1.5"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                        </path>
+                                    </svg>
+                                    <span x-text="isSavingOrder ? 'Saving...' : 'Save Order'"></span>
+                                </button>
+                            </div>
+
                             <button @click="refreshCurrentTab()"
                                 class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 <svg class="h-4 w-4 mr-1.5 text-gray-500" fill="none" viewBox="0 0 24 24"
@@ -474,8 +503,8 @@
                                     <div>
                                         <label class="block text-sm font-semibold text-gray-700 mb-1">Author
                                             Name</label>
-                                        <input type="text" x-model="editorForm.author" :disabled="viewMode === 'edit'"
-                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100 disabled:text-gray-500 transition font-mono text-sm"
+                                        <input type="text" x-model="editorForm.author"
+                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-mono text-sm"
                                             placeholder="e.g., Steve Jobs" :required="currentTab === 'quotes'">
                                     </div>
                                     <div>
@@ -545,6 +574,53 @@
                                     <!-- SimpleMDE container for Markdowns -->
                                     <div x-ignore>
                                         <textarea id="markdown-editor" class="w-full"></textarea>
+                                    </div>
+
+                                    <!-- Attached Images Manager -->
+                                    <div x-show="(currentTab === 'recipes' || currentTab === 'blogs') && attachedImages.length > 0"
+                                        class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                        <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                                            <svg class="w-4 h-4 mr-1.5 text-indigo-500" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Attached Images
+                                        </h4>
+                                        <div class="space-y-2">
+                                            <template x-for="img in attachedImages" :key="img.url">
+                                                <div
+                                                    class="flex items-center justify-between p-2 bg-white rounded border border-gray-100 shadow-sm">
+                                                    <div class="flex items-center space-x-3 overflow-hidden">
+                                                        <img :src="img.url"
+                                                            class="w-10 h-10 object-cover rounded shadow-sm border border-gray-100 flex-shrink-0">
+                                                        <span class="text-xs text-gray-600 font-mono truncate"
+                                                            x-text="img.filename"></span>
+                                                    </div>
+                                                    <button @click.prevent="deleteAttachedImage(img)"
+                                                        class="text-red-500 hover:text-red-700 p-1.5 bg-red-50 rounded hover:bg-red-100 transition flex-shrink-0 ml-2"
+                                                        :disabled="isDeletingImage === img.filename"
+                                                        title="Delete image from post and repository">
+                                                        <svg x-show="isDeletingImage !== img.filename" class="w-4 h-4"
+                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                        <svg x-show="isDeletingImage === img.filename"
+                                                            class="w-4 h-4 animate-spin text-red-500"
+                                                            xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            viewBox="0 0 24 24">
+                                                            <circle class="opacity-25" cx="12" cy="12" r="10"
+                                                                stroke="currentColor" stroke-width="4"></circle>
+                                                            <path class="opacity-75" fill="currentColor"
+                                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                                            </path>
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </template>
+                                        </div>
                                     </div>
                                 </div>
 

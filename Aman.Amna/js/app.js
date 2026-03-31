@@ -44,6 +44,10 @@ function adminApp() {
             mediaPreview: '',
             mediaBase64: '',
         },
+        attachedImages: [],
+        isDeletingImage: null,
+        imageSortOrder: 'newest',
+        isSavingOrder: false,
         mediaError: '',
         isUploadingInEditor: false,
 
@@ -209,6 +213,14 @@ function adminApp() {
                         forceSync: true
                     });
                     this.editor.value(this.editorForm.content);
+
+                    // Parse initial attached images
+                    this.parseAttachedImages();
+
+                    // Listen for changes to dynamically update attached images
+                    this.editor.codemirror.on("change", () => {
+                        this.parseAttachedImages();
+                    });
 
                     // Force SimpleMDE to recalculate layout geometry after Alpine x-show completes
                     setTimeout(() => {
@@ -553,6 +565,63 @@ function adminApp() {
             }
         },
 
+        parseAttachedImages() {
+            if (!this.editor) return;
+            const content = this.editor.value();
+            // Match markdown image syntax: ![alt](url)
+            const regex = /!\[.*?\]\((.*?)\)/g;
+            const matches = [...content.matchAll(regex)];
+            this.attachedImages = matches.map(m => {
+                const url = m[1];
+                const filename = url.split('/').pop();
+                return { url, filename, fullMatch: m[0] };
+            });
+        },
+
+        async deleteAttachedImage(img) {
+            if (!confirm(`Delete ${img.filename} from this post and permanently remove it from the image gallery?`)) return;
+
+            this.isDeletingImage = img.filename;
+
+            try {
+                // 1. Remove the image tag from the Markdown editor
+                const currentContent = this.editor.value();
+                const newContent = currentContent.replace(img.fullMatch, '');
+                this.editor.value(newContent);
+                this.parseAttachedImages(); // Refresh the list
+
+                // 2. Delete the physical file from GitHub
+                // Try to find the SHA from loaded contents, or fetch it directly
+                let sha = null;
+                const path = `img/photos/${img.filename}`;
+                const fileInState = this.contents.find(c => c.name === img.filename);
+
+                if (fileInState && fileInState.sha) {
+                    sha = fileInState.sha;
+                } else {
+                    try {
+                        const fileData = await this.api.getFileContent(path);
+                        sha = fileData.sha;
+                    } catch (e) { /* File might already be gone */ }
+                }
+
+                if (sha) {
+                    await this.api.deleteFile(path, `Delete attached image: ${img.filename}`, sha);
+                    await this.updateImageManifest();
+                    this.showNotification(`Successfully deleted ${img.filename}`, 'success');
+
+                    // Remove from active contents array if it's there
+                    this.contents = this.contents.filter(c => c.sha !== sha);
+                } else {
+                    this.showNotification(`Removed from post. (File not found in gallery)`, 'success');
+                }
+            } catch (err) {
+                this.showNotification('Failed to delete image: ' + err.message, 'error');
+            } finally {
+                this.isDeletingImage = null;
+            }
+        },
+
         async updateImageManifest() {
             try {
                 // Fetch current image list from GitHub
@@ -571,6 +640,57 @@ function adminApp() {
                 await this.api.saveFile('img/photos/manifest.json', content, 'Update image manifest', existingSha, false);
             } catch (err) {
                 console.warn('Could not update manifest.json:', err.message);
+            }
+        },
+
+        sortImages() {
+            if (this.currentTab !== 'images') return;
+            switch (this.imageSortOrder) {
+                case 'newest':
+                    this.contents.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+                case 'oldest':
+                    this.contents.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'az':
+                    // Extract original name by skipping the 13-digit timestamp block
+                    this.contents.sort((a, b) => {
+                        const nameA = a.name.split('-').slice(1).join('-') || a.name;
+                        const nameB = b.name.split('-').slice(1).join('-') || b.name;
+                        return nameA.localeCompare(nameB);
+                    });
+                    break;
+                case 'za':
+                    this.contents.sort((a, b) => {
+                        const nameA = a.name.split('-').slice(1).join('-') || a.name;
+                        const nameB = b.name.split('-').slice(1).join('-') || b.name;
+                        return nameB.localeCompare(nameA);
+                    });
+                    break;
+            }
+        },
+
+        async saveImageOrder() {
+            if (!confirm('This will permanently update the public gallery to match this exact order. Continue?')) return;
+            this.isSavingOrder = true;
+            try {
+                // Ensure contents are sorted exactly as they appear on screen right now
+                this.sortImages();
+                const names = this.contents.map(f => f.name);
+                const content = btoa(JSON.stringify(names, null, 2));
+
+                let existingSha = null;
+                try {
+                    const existing = await this.api.request('/repos/{owner}/{repo}/contents/img/photos/manifest.json');
+                    existingSha = existing.sha;
+                } catch (e) { }
+
+                await this.api.saveFile('img/photos/manifest.json', content, 'Save custom image gallery order', existingSha, false);
+                this.showNotification('Gallery order saved successfully!', 'success');
+            } catch (err) {
+                this.showNotification('Failed to save order: ' + err.message, 'error');
+            } finally {
+                this.isSavingOrder = false;
             }
         }
     }
