@@ -1,12 +1,11 @@
-
 ![photo_2026-03-31_23-13-53.jpg](/img/photos/1774979058578-photo_2026-03-31_23-13-53.jpg)
 
 
-* 3 ripe bananas, = 1 ½ cups mashed banana
+ingredients: 3 ripe bananas, = 1 ½ cups mashed banana
 ⅓ cup brown sugar
 ¼ cup honey
 ¼ cup milk
-1 vanilla packet
+* 1 vanilla packet
 1 tsp apple cider vinegar
 3 tbsp butter, melted
 2 cups oat flour
