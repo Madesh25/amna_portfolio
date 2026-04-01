@@ -7,11 +7,10 @@
 pinch of salt.
 
 1 tbsp of dates molasses.
+
 1 tps of olive oil.
+
 sprinkle of Basisa (optional).
-
-
-
 
 <!-- SPLIT -->
 
