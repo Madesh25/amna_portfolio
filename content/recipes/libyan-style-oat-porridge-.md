@@ -1,11 +1,17 @@
 ![img_20260331_204947_256.jpg](/img/photos/1774995053161-img_20260331_204947_256.jpg)
 
 * 1/2 cup of ground oats.
+
 1 cup of milk.
+
 pinch of salt.
+
 1 tbsp of dates molasses.
 1 tps of olive oil.
 sprinkle of Basisa (optional).
+
+
+
 
 <!-- SPLIT -->
 
